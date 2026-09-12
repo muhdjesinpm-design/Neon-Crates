@@ -16,8 +16,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 
-const DB_DIR = path.join(__dirname, 'data');
-const DB_FILE = path.join(DB_DIR, 'database.json');
+const DB_PATH = process.env.RENDER ? '/tmp/database.json' : path.join(__dirname, 'database.json');
 const DEFAULT_DB = {
   admin: {},
   users: [],
@@ -58,7 +57,7 @@ app.use(express.json({ limit: '10mb' }));
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
-  const user = loadDB().users.find(candidate => candidate.id === id);
+  const user = loadData().users.find(candidate => candidate.id === id);
   done(null, user || false);
 });
 
@@ -69,7 +68,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     callbackURL: GOOGLE_CALLBACK_URL
   }, (accessToken, refreshToken, profile, done) => {
     try {
-      const db = loadDB();
+      const db = loadData();
       const email = profile.emails?.[0]?.value?.trim().toLowerCase() || '';
       let user = db.users.find(candidate =>
         candidate.googleId === profile.id || (email && candidate.email === email)
@@ -93,7 +92,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
       user.role = ADMIN_EMAILS.includes(user.email) ? 'admin' : 'user';
 
-      if (!saveDB(db)) return done(new Error('Could not save the Google account.'));
+      if (!saveData(db)) return done(new Error('Could not save the Google account.'));
       return done(null, user);
     } catch (error) {
       return done(error);
@@ -141,7 +140,7 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 8 characters.' });
     }
 
-    const db = loadDB();
+    const db = loadData();
     if (db.users.some(user => typeof user.email === 'string' && user.email.toLowerCase() === normalizedEmail)) {
       return res.status(409).json({ error: 'An account with this email address already exists.' });
     }
@@ -157,7 +156,7 @@ app.post('/signup', async (req, res) => {
     };
 
     db.users.push(user);
-    if (!saveDB(db)) {
+    if (!saveData(db)) {
       return res.status(500).json({ error: 'Could not save the account.' });
     }
 
@@ -178,7 +177,7 @@ app.post('/login', async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    const db = loadDB();
+    const db = loadData();
     const user = db.users.find(candidate => candidate.email.toLowerCase() === normalizedEmail);
 
     if (!user || typeof user.passwordHash !== 'string') {
@@ -214,66 +213,28 @@ function logSecurity(event) {
 /* ==========================================================================
    Database Operations
    ========================================================================== */
-function loadDB() {
+function loadData() {
   try {
-    if (!fs.existsSync(DB_DIR)) {
-      fs.mkdirSync(DB_DIR, { recursive: true });
+    if (fs.existsSync(DB_PATH)) {
+      return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
     }
 
-    if (!fs.existsSync(DB_FILE)) {
-      const initialDB = JSON.parse(JSON.stringify(DEFAULT_DB));
-      fs.writeFileSync(DB_FILE, JSON.stringify(initialDB, null, 2), 'utf8');
-      return initialDB;
-    }
+    const defaultPath = path.join(__dirname, 'database.json');
+    const data = fs.existsSync(defaultPath)
+      ? JSON.parse(fs.readFileSync(defaultPath, 'utf8'))
+      : JSON.parse(JSON.stringify(DEFAULT_DB));
 
-    const raw = fs.readFileSync(DB_FILE, 'utf8');
-    const storedDB = JSON.parse(raw);
-    const normalizedDB = {
-      ...DEFAULT_DB,
-      ...storedDB,
-      users: Array.isArray(storedDB.users) ? storedDB.users : [],
-      products: Array.isArray(storedDB.products) ? storedDB.products : [],
-      orders: Array.isArray(storedDB.orders) ? storedDB.orders : [],
-      promos: Array.isArray(storedDB.promos) ? storedDB.promos : [],
-      banners: Array.isArray(storedDB.banners) ? storedDB.banners : DEFAULT_DB.banners
-    };
-
-    if (!Array.isArray(storedDB.banners)) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(normalizedDB, null, 2), 'utf8');
-    }
-
-    return normalizedDB;
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+    return data;
   } catch (err) {
-    console.error('Error reading database file:', err);
+    console.error('Error loading database file:', err);
     return JSON.parse(JSON.stringify(DEFAULT_DB));
   }
 }
 
-function saveDB(data) {
+function saveData(data) {
   try {
-    if (!fs.existsSync(DB_DIR)) {
-      fs.mkdirSync(DB_DIR, { recursive: true });
-    }
-    let storedDB = {};
-    if (fs.existsSync(DB_FILE)) {
-      try {
-        storedDB = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-      } catch (err) {
-        console.error('Error parsing existing database before save:', err);
-      }
-    }
-
-    const mergedDB = {
-      ...storedDB,
-      ...data,
-      users: Array.isArray(data.users) ? data.users : (storedDB.users || []),
-      products: Array.isArray(data.products) ? data.products : (storedDB.products || []),
-      orders: Array.isArray(data.orders) ? data.orders : (storedDB.orders || []),
-      promos: Array.isArray(data.promos) ? data.promos : (storedDB.promos || []),
-      banners: Array.isArray(data.banners) ? data.banners : (storedDB.banners || [])
-    };
-
-    fs.writeFileSync(DB_FILE, JSON.stringify(mergedDB, null, 2), 'utf8');
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
     return true;
   } catch (err) {
     console.error('Error saving database file:', err);
@@ -460,7 +421,7 @@ app.use('/api', (req, res, next) => {
 });
 
 app.get('/api/admin/metrics', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   const revenue = db.orders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
   const activeStatuses = new Set(['Pending', 'Packing', 'Drone Out']);
   const activeOrders = db.orders.filter(order => activeStatuses.has(order.status)).length;
@@ -473,14 +434,14 @@ app.get('/api/admin/metrics', verifyAdmin, (req, res) => {
   });
 });
 
-app.get('/api/admin/products', verifyAdmin, (req, res) => res.json(loadDB().products || []));
+app.get('/api/admin/products', verifyAdmin, (req, res) => res.json(loadData().products || []));
 
 app.post('/api/admin/products', verifyAdmin, (req, res) => {
   const body = req.body || {};
   if (!body.title || !body.category || body.price === undefined) {
     return res.status(400).json({ error: 'Title, category, and price are required.' });
   }
-  const db = loadDB();
+  const db = loadData();
   const product = {
     id: `prod-${Date.now()}`,
     title: String(body.title).trim(),
@@ -494,12 +455,12 @@ app.post('/api/admin/products', verifyAdmin, (req, res) => {
     dietary: body.dietary || []
   };
   db.products.push(product);
-  saveDB(db);
+  saveData(db);
   return res.status(201).json(product);
 });
 
 app.put('/api/admin/products/:id', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   const product = db.products.find(item => item.id === req.params.id);
   if (!product) return res.status(404).json({ error: 'Product not found.' });
   const body = req.body || {};
@@ -509,31 +470,31 @@ app.put('/api/admin/products/:id', verifyAdmin, (req, res) => {
   if (body.stock !== undefined) product.stock = Number(body.stock) || 0;
   if (body.image !== undefined) product.image = body.image;
   if (body.unit !== undefined) product.unit = String(body.unit).trim();
-  saveDB(db);
+  saveData(db);
   return res.json(product);
 });
 
 app.delete('/api/admin/products/:id', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   const index = db.products.findIndex(item => item.id === req.params.id);
   if (index < 0) return res.status(404).json({ error: 'Product not found.' });
   const [product] = db.products.splice(index, 1);
-  saveDB(db);
+  saveData(db);
   return res.json({ success: true, product });
 });
 
-app.get('/api/admin/orders', verifyAdmin, (req, res) => res.json(loadDB().orders || []));
+app.get('/api/admin/orders', verifyAdmin, (req, res) => res.json(loadData().orders || []));
 
 app.put('/api/admin/orders/:id', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   const order = db.orders.find(item => item.orderId === req.params.id || item.id === req.params.id);
   if (!order) return res.status(404).json({ error: 'Order not found.' });
   if (req.body?.status) order.status = req.body.status;
-  saveDB(db);
+  saveData(db);
   return res.json(order);
 });
 
-app.get('/api/admin/users', verifyAdmin, (req, res) => res.json((loadDB().users || []).map(user => ({
+app.get('/api/admin/users', verifyAdmin, (req, res) => res.json((loadData().users || []).map(user => ({
   id: user.id,
   name: user.name,
   email: user.email,
@@ -542,30 +503,30 @@ app.get('/api/admin/users', verifyAdmin, (req, res) => res.json((loadDB().users 
 }))));
 
 app.put('/api/admin/users/:id', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   const user = db.users.find(item => item.id === req.params.id);
   if (!user) return res.status(404).json({ error: 'User not found.' });
   if (req.body?.role === 'admin' || req.body?.role === 'user') user.role = req.body.role;
   if (typeof req.body?.suspended === 'boolean') user.suspended = req.body.suspended;
-  saveDB(db);
+  saveData(db);
   return res.json({ id: user.id, name: user.name, email: user.email, role: user.role || 'user', suspended: Boolean(user.suspended) });
 });
 
-app.get('/api/admin/promos', verifyAdmin, (req, res) => res.json(loadDB().promos || []));
+app.get('/api/admin/promos', verifyAdmin, (req, res) => res.json(loadData().promos || []));
 
 app.post('/api/admin/promos', verifyAdmin, (req, res) => {
   const { code, discountPercent, maxUses } = req.body || {};
   if (!code || Number(discountPercent) <= 0) return res.status(400).json({ error: 'Code and discount percent are required.' });
-  const db = loadDB();
+  const db = loadData();
   const promo = { code: String(code).trim().toUpperCase(), discountPercent: Number(discountPercent), maxUses: Number(maxUses) || 0, uses: 0, active: true };
   db.promos = db.promos || [];
   db.promos.push(promo);
-  saveDB(db);
+  saveData(db);
   return res.status(201).json(promo);
 });
 
 app.get('/api/banners', (req, res) => {
-  const banners = loadDB().banners || [];
+  const banners = loadData().banners || [];
   return res.json(banners.filter(banner => banner.active !== false));
 });
 
@@ -575,7 +536,7 @@ app.post('/api/admin/banners', verifyAdmin, (req, res) => {
     return res.status(400).json({ error: 'Badge, title, text, and type are required.' });
   }
 
-  const db = loadDB();
+  const db = loadData();
   const banner = {
     id: String(id || `b-${Date.now()}`).trim(),
     badge: String(badge).trim(),
@@ -590,24 +551,24 @@ app.post('/api/admin/banners', verifyAdmin, (req, res) => {
   }
 
   db.banners.push(banner);
-  if (!saveDB(db)) return res.status(500).json({ error: 'Could not save the banner.' });
+  if (!saveData(db)) return res.status(500).json({ error: 'Could not save the banner.' });
   return res.status(201).json(banner);
 });
 
 app.delete('/api/admin/banners/:id', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   const index = db.banners.findIndex(banner => banner.id === req.params.id);
   if (index < 0) return res.status(404).json({ error: 'Banner not found.' });
 
   const [banner] = db.banners.splice(index, 1);
-  if (!saveDB(db)) return res.status(500).json({ error: 'Could not save banner changes.' });
+  if (!saveData(db)) return res.status(500).json({ error: 'Could not save banner changes.' });
   return res.json({ success: true, banner });
 });
 
 app.post('/api/admin/announcement', verifyAdmin, (req, res) => {
-  const db = loadDB();
+  const db = loadData();
   db.announcement = String(req.body?.text || '').trim();
-  saveDB(db);
+  saveData(db);
   return res.json({ announcement: db.announcement });
 });
 
@@ -616,7 +577,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/announcement', (req, res) => {
-  return res.json({ announcement: loadDB().announcement || '' });
+  return res.json({ announcement: loadData().announcement || '' });
 });
 
 app.use(async (req, res, next) => {
@@ -651,7 +612,7 @@ app.use(async (req, res, next) => {
           return sendError(res, 400, 'All fields (name, phone, email, address, password) are required.');
         }
 
-        const db = loadDB();
+        const db = loadData();
         const existing = db.users.find(u => typeof u.email === 'string' && u.email.toLowerCase() === email.toLowerCase().trim());
         if (existing) {
           return sendError(res, 409, 'An account with this email address already exists.');
@@ -672,7 +633,7 @@ app.use(async (req, res, next) => {
         };
 
         db.users.push(newUser);
-        saveDB(db);
+        saveData(db);
 
         const token = signToken({ id: newUser.id, email: newUser.email, role: 'customer' });
         logSecurity(`New customer registered: ${newUser.email} (${newUser.name})`);
@@ -702,7 +663,7 @@ app.use(async (req, res, next) => {
           return sendError(res, 400, 'Email and password are required.');
         }
 
-        const db = loadDB();
+        const db = loadData();
         const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
         if (!user || typeof user.passwordHash !== 'string') {
           return sendError(res, 401, 'Invalid email or password.');
@@ -736,7 +697,7 @@ app.use(async (req, res, next) => {
       const userPayload = getUserFromReq(req);
       if (!userPayload) return sendError(res, 401, 'Unauthorized');
 
-      const db = loadDB();
+      const db = loadData();
       const user = db.users.find(u => u.id === userPayload.id);
       if (!user) return sendError(res, 404, 'User profile not found');
 
@@ -758,7 +719,7 @@ app.use(async (req, res, next) => {
 
       try {
         const body = req.body || {};
-        const db = loadDB();
+        const db = loadData();
         const user = db.users.find(u => u.id === userPayload.id);
         if (!user) return sendError(res, 404, 'User profile not found');
 
@@ -766,7 +727,7 @@ app.use(async (req, res, next) => {
         if (body.phone) user.phone = body.phone.trim();
         if (body.address) user.address = body.address.trim();
 
-        saveDB(db);
+        saveData(db);
         logSecurity(`Customer profile updated: ${user.email}`);
 
         return sendJSON(res, 200, {
@@ -785,7 +746,7 @@ app.use(async (req, res, next) => {
 
     // --- Products: List All (Public) ---
     if (pathname === '/api/products' && method === 'GET') {
-      const db = loadDB();
+      const db = loadData();
       return sendJSON(res, 200, db.products || []);
     }
 
@@ -802,7 +763,7 @@ app.use(async (req, res, next) => {
           return sendError(res, 400, 'Title, category, and price are required.');
         }
 
-        const db = loadDB();
+        const db = loadData();
         const newProduct = {
           id: 'prod-' + Date.now(),
           title: title.trim(),
@@ -822,7 +783,7 @@ app.use(async (req, res, next) => {
         };
 
         db.products.push(newProduct);
-        saveDB(db);
+        saveData(db);
         logSecurity(`New product added to catalog by admin: "${newProduct.title}" ($${newProduct.price})`);
 
         return sendJSON(res, 201, newProduct);
@@ -839,7 +800,7 @@ app.use(async (req, res, next) => {
       try {
         const productId = pathname.replace('/api/products/', '').trim();
         const body = req.body || {};
-        const db = loadDB();
+        const db = loadData();
         const product = db.products.find(item => item.id === productId);
         if (!product) return sendError(res, 404, 'Product not found');
 
@@ -851,7 +812,7 @@ app.use(async (req, res, next) => {
         if (body.image !== undefined) product.image = body.image;
         if (body.description !== undefined) product.description = String(body.description).trim();
 
-        saveDB(db);
+        saveData(db);
         logSecurity(`Product updated in catalog: "${product.title}" (ID: ${productId})`);
         return sendJSON(res, 200, product);
       } catch (e) {
@@ -865,7 +826,7 @@ app.use(async (req, res, next) => {
       if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       const productId = pathname.replace('/api/products/', '').trim();
-      const db = loadDB();
+      const db = loadData();
       const idx = db.products.findIndex(p => p.id === productId);
 
       if (idx === -1) {
@@ -873,7 +834,7 @@ app.use(async (req, res, next) => {
       }
 
       const deleted = db.products.splice(idx, 1)[0];
-      saveDB(db);
+      saveData(db);
       logSecurity(`Product deleted from catalog: "${deleted.title}" (ID: ${productId})`);
 
       return sendJSON(res, 200, { success: true, message: 'Product deleted', product: deleted });
@@ -890,7 +851,7 @@ app.use(async (req, res, next) => {
         }
 
         const userPayload = getUserFromReq(req);
-        const db = loadDB();
+        const db = loadData();
 
         const newOrder = {
           orderId: 'NC-' + Math.floor(100000 + Math.random() * 900000),
@@ -912,7 +873,7 @@ app.use(async (req, res, next) => {
         };
 
         db.orders.push(newOrder);
-        saveDB(db);
+        saveData(db);
         logSecurity(`New Order placed: ${newOrder.orderId} by ${newOrder.name} - Total: $${newOrder.total}`);
 
         return sendJSON(res, 201, newOrder);
@@ -926,7 +887,7 @@ app.use(async (req, res, next) => {
       const userPayload = getUserFromReq(req);
       if (!userPayload) return sendError(res, 401, 'Unauthorized');
 
-      const db = loadDB();
+      const db = loadData();
       const myOrders = db.orders.filter(o => o.userId === userPayload.id);
       return sendJSON(res, 200, myOrders);
     }
@@ -936,7 +897,7 @@ app.use(async (req, res, next) => {
       const admin = getAdminFromReq(req);
       if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
-      const db = loadDB();
+      const db = loadData();
       return sendJSON(res, 200, db.orders || []);
     }
 
@@ -953,12 +914,12 @@ app.use(async (req, res, next) => {
 
         if (!status) return sendError(res, 400, 'Status field required');
 
-        const db = loadDB();
+        const db = loadData();
         const order = db.orders.find(o => o.orderId === orderId);
         if (!order) return sendError(res, 404, 'Order not found');
 
         order.status = status;
-        saveDB(db);
+        saveData(db);
         logSecurity(`Order ${orderId} status updated to "${status}" by admin`);
 
         return sendJSON(res, 200, { success: true, order });
@@ -972,7 +933,7 @@ app.use(async (req, res, next) => {
       const admin = getAdminFromReq(req);
       if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
-      const db = loadDB();
+      const db = loadData();
       const grossSales = db.orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
       const pendingOrders = db.orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
 

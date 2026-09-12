@@ -1,3 +1,5 @@
+const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
+
 /**
  * NeonCrates - Cyber-Fresh Online Grocery Supermarket Engine
  * Vanilla JavaScript Single Page Application with User Accounts & Admin Portal
@@ -706,10 +708,6 @@
     if (STATE.adminToken) localStorage.setItem('neon_crates_admin_token', STATE.adminToken);
     else localStorage.removeItem('neon_crates_admin_token');
   }
-
-  const API_BASE_URL = window.location.protocol === 'file:'
-    ? 'http://localhost:3000'
-    : '';
 
   async function apiRequest(endpoint, options = {}) {
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };

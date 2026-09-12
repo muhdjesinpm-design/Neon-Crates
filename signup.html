@@ -36,6 +36,8 @@
     <p class="footer">Already have an account? <a href="login.html">Sign in</a></p>
   </main>
   <script>
+    const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
+
     document.getElementById("signup-form").addEventListener("submit", async (event) => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -44,7 +46,7 @@
       message.textContent = "Creating your account...";
       message.style.color = "#9ca3af";
       try {
-        const response = await fetch("/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        const response = await fetch(`${API_BASE_URL}/signup`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || "Unable to create the account.");
         localStorage.setItem("neon_crates_auth_token", result.token);

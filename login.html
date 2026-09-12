@@ -321,6 +321,8 @@
   </main>
 
   <script>
+    const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
+
     const passwordInput = document.getElementById("password");
     const togglePassword = document.getElementById("toggle-password");
     const loginForm = document.querySelector("form");
@@ -339,7 +341,7 @@
       loginMessage.style.color = "#9ca3af";
 
       try {
-        const response = await fetch("/login", {
+        const response = await fetch(`${API_BASE_URL}/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

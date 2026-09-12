@@ -740,8 +740,10 @@ footer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 0.85rem;
-  max-height: 340px;
+  max-height: 420px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding-right: 0.4rem;
 }
 
@@ -754,10 +756,12 @@ footer {
 }
 
 .mini-pick-card {
+  min-height: 142px;
+  height: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 0.6rem;
+  padding: 0.7rem;
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -770,7 +774,8 @@ footer {
 
 .mini-pick-card img {
   width: 100%;
-  height: 70px;
+  height: 72px;
+  min-height: 72px;
   object-fit: cover;
   border-radius: 6px;
   margin-bottom: 0.4rem;
@@ -2012,6 +2017,12 @@ footer {
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-size: 0.85rem;
+  box-sizing: border-box;
+}
+
+.newsletter-form button,
+.footer button {
+  box-sizing: border-box;
 }
 
 .newsletter-input:focus {
@@ -2128,6 +2139,65 @@ footer {
   }
   .product-card-top {
     height: 140px;
+  }
+
+  .site-footer,
+  .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-grid {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .footer-col,
+  .footer-section {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .newsletter-form,
+  .newsletter-input,
+  .newsletter-form button,
+  .footer input,
+  .footer button {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+  }
+
+  .builder-pick-list {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .builder-items-grid {
+    width: 100%;
+    max-height: 480px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-y: auto;
+  }
+
+  .mini-pick-card {
+    min-height: 154px;
+    height: 154px;
+    padding: 0.75rem;
+  }
+
+  .mini-pick-card img {
+    height: 76px;
+    min-height: 76px;
   }
 }
 

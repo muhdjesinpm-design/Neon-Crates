@@ -942,6 +942,71 @@ footer {
   padding: 1rem 0 2rem;
 }
 
+.promo-banner-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 15px auto 20px;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.promo-swiper {
+  height: 140px;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.promo-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem 4.5rem 1.5rem 2rem;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.promo-flash { background: linear-gradient(120deg, #ed1c24, #ff7a18); }
+.promo-drone { background: linear-gradient(120deg, #075985, #06b6d4); }
+.promo-organic { background: linear-gradient(120deg, #166534, #84cc16); }
+
+.promo-swiper h2 {
+  margin-bottom: 0.35rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  line-height: 1.1;
+}
+
+.promo-swiper p {
+  font-size: 0.9rem;
+  opacity: 0.92;
+}
+
+.promo-badge {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 999px;
+  background: rgba(0,0,0,.18);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.promo-swiper .swiper-button-prev,
+.promo-swiper .swiper-button-next {
+  color: #fff;
+}
+
+.promo-swiper .swiper-button-prev::after,
+.promo-swiper .swiper-button-next::after {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.promo-swiper .swiper-pagination-bullet { background: #fff; opacity: 0.55; }
+.promo-swiper .swiper-pagination-bullet-active { opacity: 1; }
+
 .section-header {
   display: flex;
   align-items: flex-end;
@@ -2081,6 +2146,27 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .promo-banner-section {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+  }
+
+  .promo-swiper {
+    height: 160px;
+  }
+
+  .promo-swiper .swiper-slide {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.25rem 3rem 1.25rem 1.25rem;
+  }
+
+  .promo-swiper h2 { font-size: 1.2rem; }
+  .promo-swiper p { font-size: 0.78rem; }
+
   .store-section {
     padding-top: 10px;
     padding-bottom: 20px;

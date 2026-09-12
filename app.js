@@ -1990,6 +1990,26 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
   /* ==========================================================================
      Application Initialization
      ========================================================================== */
+  function initializePromoSwiper() {
+    if (typeof Swiper === 'undefined' || !document.querySelector('.promo-swiper')) return;
+
+    new Swiper('.promo-swiper', {
+      loop: true,
+      autoplay: {
+        delay: 3500,
+        disableOnInteraction: false
+      },
+      pagination: {
+        el: '.promo-swiper .swiper-pagination',
+        clickable: true
+      },
+      navigation: {
+        nextEl: '.promo-swiper .swiper-button-next',
+        prevEl: '.promo-swiper .swiper-button-prev'
+      }
+    });
+  }
+
   async function init() {
     applyTheme(STATE.theme);
     updateUserHeaderUI();
@@ -1999,6 +2019,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     updateCartDrawerUI();
     renderCrateBuilder();
     setupEventListeners();
+    initializePromoSwiper();
   }
 
   if (document.readyState === 'loading') {

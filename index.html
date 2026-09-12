@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="styles.css" />
@@ -285,6 +286,28 @@
   <!-- ==========================================================================
        Store Products & Aisles
        ========================================================================== -->
+  <section class="promo-banner-section" aria-label="Current promotions">
+    <div class="swiper promo-swiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide promo-flash">
+          <span class="promo-badge">Limited time</span>
+          <div><h2>FLASH SALE - 20% OFF ALL CRATES</h2><p>Use promo code <strong>NEON20</strong> at checkout.</p></div>
+        </div>
+        <div class="swiper-slide promo-drone">
+          <span class="promo-badge">Fast dispatch</span>
+          <div><h2>15-MIN EXPRESS</h2><p>Autonomous drone delivery from local hubs to your door.</p></div>
+        </div>
+        <div class="swiper-slide promo-organic">
+          <span class="promo-badge">Fresh this week</span>
+          <div><h2>WEEKLY DROP</h2><p>Fresh organic harvests selected for peak flavor.</p></div>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+      <button class="swiper-button-prev" type="button" aria-label="Previous promotion"></button>
+      <button class="swiper-button-next" type="button" aria-label="Next promotion"></button>
+    </div>
+  </section>
+
   <section class="store-section" id="store-aisles">
     <div class="container">
       
@@ -940,13 +963,16 @@
 
   <script>
     const productSection = document.getElementById('store-aisles');
+    const promoSection = document.querySelector('.promo-banner-section');
     const heroSection = document.querySelector('.hero-section');
-    if (productSection && heroSection) {
+    if (productSection && promoSection && heroSection) {
+      heroSection.parentNode.insertBefore(promoSection, heroSection);
       heroSection.parentNode.insertBefore(productSection, heroSection);
     }
   </script>
 
   <!-- Application Script -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

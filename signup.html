@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0f19" />
+  <title>Create Account | NeonCrates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0b0f19;--card:rgba(18,28,45,.84);--mint:#00ff9d;--cyan:#60efff;--text:#fff;--muted:#9ca3af;--border:rgba(16,185,129,.22);--heading:"Outfit",sans-serif;--body:"Plus Jakarta Sans",sans-serif}
+    *{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:1.5rem 1rem;color:var(--text);font-family:var(--body);background:radial-gradient(circle at 15% 10%,rgba(0,255,157,.09),transparent 30rem),radial-gradient(circle at 90% 85%,rgba(96,239,255,.07),transparent 28rem),var(--bg)}
+    .card{width:min(100%,480px);padding:clamp(1.5rem,5vw,2.6rem);border:1px solid var(--border);border-radius:24px;background:linear-gradient(145deg,rgba(24,38,59,.9),var(--card));box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 45px rgba(0,255,157,.06);backdrop-filter:blur(18px)}
+    .brand{display:inline-flex;align-items:center;gap:.7rem;margin-bottom:1.8rem;color:var(--text);font:800 1.4rem var(--heading);letter-spacing:-.04em;text-decoration:none}.brand span{color:var(--mint)}.badge{display:grid;width:2.6rem;height:2.6rem;place-items:center;border:1px solid rgba(0,255,157,.5);border-radius:11px;color:#04120e;background:linear-gradient(135deg,var(--mint),var(--cyan));box-shadow:0 0 20px rgba(0,255,157,.28)}
+    h1{margin:0;font:800 clamp(2rem,6vw,2.4rem)/1.1 var(--heading);letter-spacing:-.04em}.intro{margin:.7rem 0 1.7rem;color:var(--muted);font-size:.9rem;line-height:1.6}.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.field{margin-bottom:1rem}.field.full{grid-column:1/-1}label{display:block;margin-bottom:.45rem;color:#d1d5db;font-size:.78rem;font-weight:600}input{width:100%;min-height:3rem;padding:.8rem .9rem;border:1px solid rgba(156,163,175,.22);border-radius:10px;outline:0;color:var(--text);font:inherit;font-size:.85rem;background:rgba(5,10,19,.58);transition:border-color .18s,box-shadow .18s}input::placeholder{color:#6b7280}input:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.16),0 0 18px rgba(0,255,157,.08)}
+    button{width:100%;min-height:3.1rem;border:0;border-radius:10px;color:#000;font:700 .88rem var(--body);background:linear-gradient(135deg,var(--mint),#10b981);box-shadow:0 8px 24px rgba(0,255,157,.18);cursor:pointer;transition:transform .18s,box-shadow .18s}button:hover{box-shadow:0 0 26px rgba(0,255,157,.42);transform:translateY(-1px)}#message{min-height:1.2rem;margin:.9rem 0 0;text-align:center;font-size:.78rem}.footer{margin:1.4rem 0 0;color:var(--muted);text-align:center;font-size:.8rem}a{color:var(--mint);font-weight:600;text-decoration:none}a:hover{color:var(--cyan);text-decoration:underline}@media(max-width:430px){.grid{display:block}.field{margin-bottom:1rem}.card{border-radius:18px}}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <a class="brand" href="index.html" aria-label="NeonCrates home"><span class="badge" aria-hidden="true">⌁</span>Neon<span>Crates</span></a>
+    <h1>Create your account</h1>
+    <p class="intro">Join the freshest cyber-grocery delivery network.</p>
+    <form id="signup-form">
+      <div class="grid">
+        <div class="field"><label for="name">Full name</label><input id="name" name="name" autocomplete="name" placeholder="Alex Neon" required /></div>
+        <div class="field"><label for="phone">Phone (optional)</label><input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+1 555 0100" /></div>
+        <div class="field full"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required /></div>
+        <div class="field full"><label for="address">Delivery address (optional)</label><input id="address" name="address" autocomplete="street-address" placeholder="742 Evergreen Terrace" /></div>
+        <div class="field full"><label for="password">Password (8+ characters)</label><input id="password" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Create a secure password" required /></div>
+      </div>
+      <button type="submit">Create NeonCrates Account</button>
+      <p id="message" role="status" aria-live="polite"></p>
+    </form>
+    <p class="footer">Already have an account? <a href="login.html">Sign in</a></p>
+  </main>
+  <script>
+    document.getElementById("signup-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const message = document.getElementById("message");
+      const data = Object.fromEntries(new FormData(form));
+      message.textContent = "Creating your account...";
+      message.style.color = "#9ca3af";
+      try {
+        const response = await fetch("/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Unable to create the account.");
+        localStorage.setItem("neon_crates_auth_token", result.token);
+        localStorage.setItem("neon_crates_current_user", JSON.stringify(result.user));
+        message.textContent = "Account created. Redirecting...";
+        message.style.color = "#00ff9d";
+        window.location.href = "index.html";
+      } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#ff6b8a";
+      }
+    });
+  </script>
+</body>
+</html>

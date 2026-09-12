@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeonCrates | Ultra-Fresh Online Supermarket & Curated Crates</title>
+  
+  <!-- Meta SEO -->
+  <meta name="description" content="NeonCrates is your futuristic hyper-fresh grocery store. Fresh farm produce, organic meats, plant milks, artisan breads, and custom grocery crates delivered in 15 minutes." />
+  <meta name="theme-color" content="#080c14" />
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Ambient Glowing Background Accents -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- ==========================================================================
+       Header & Navigation
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-top">
+        
+        <!-- Brand Logo -->
+        <a href="#" class="logo" aria-label="NeonCrates Home">
+          <div class="logo-box">📦</div>
+          <div class="logo-text">Neon<span>Crates</span></div>
+        </a>
+
+        <!-- Live Search Bar -->
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search fresh avocados, pasture eggs, sourdough, crates..." 
+            autocomplete="off"
+          />
+          <button class="search-clear-btn" id="searchClearBtn" title="Clear Search">✕</button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="header-actions">
+          <!-- User Account Auth Button & Dropdown -->
+          <div style="position:relative;">
+            <button class="user-auth-btn" id="userAuthBtn" title="Account">
+              <span class="user-avatar-circle" id="userAvatar">👤</span>
+              <span id="userNameLabel">Sign In</span>
+            </button>
+            <div class="user-dropdown-menu" id="userDropdown">
+              <div class="user-dropdown-item" id="openProfileItem">
+                <span>👤</span>
+                <span>My Profile</span>
+              </div>
+              <div class="user-dropdown-item" id="openUserOrdersItem">
+                <span>📦</span>
+                <span>My Orders</span>
+              </div>
+              <div class="user-dropdown-item logout" id="logoutItem" style="border-top:1px solid var(--border-subtle);margin-top:0.25rem;">
+                <span>🚪</span>
+                <span>Sign Out</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Portal Trigger -->
+          <button class="admin-badge-btn" id="adminPortalBtn" title="Open Store Management Portal">
+            <span>🛡️</span>
+            <span>Admin</span>
+          </button>
+
+          <!-- Theme Toggle -->
+          <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+            <span id="themeIcon">☀️</span>
+          </button>
+
+          <!-- Wishlist / Favorites -->
+          <button class="icon-btn" id="wishlistBtn" title="Saved Favorites">
+            <span>❤️</span>
+            <span class="badge" id="wishlistBadge">0</span>
+          </button>
+
+          <!-- Cart Trigger -->
+          <button class="cart-btn" id="cartToggleBtn" title="View Cart">
+            <span>🛒</span>
+            <span class="cart-total" id="cartTotalDisplay">$0.00</span>
+            <span class="badge" id="cartCountBadge">0</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Category Navigation Pill Bar -->
+      <nav class="category-nav-bar" aria-label="Grocery Aisles">
+        <button class="cat-nav-item active" data-category="all">✨ All Aisles</button>
+        <button class="cat-nav-item" data-category="crates">📦 Signature Crates</button>
+        <button class="cat-nav-item" data-category="fruits">🍎 Neon Orchards</button>
+        <button class="cat-nav-item" data-category="vegetables">🥬 Farm Greens</button>
+        <button class="cat-nav-item" data-category="dairy">🥛 Dairy & Eggs</button>
+        <button class="cat-nav-item" data-category="bakery">🥖 Artisan Bakery</button>
+        <button class="cat-nav-item" data-category="proteins">🥩 Prime Proteins</button>
+        <button class="cat-nav-item" data-category="snacks">🍿 CyberSnacks & Drinks</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Hero Section
+       ========================================================================== -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-grid">
+        
+        <!-- Left Hero Content -->
+        <div class="hero-content">
+          <div class="hero-badge-pill">
+            <span class="pulse-dot"></span>
+            <span>⚡ 15-Minute Drone Delivery Activated in Your Zone</span>
+          </div>
+
+          <h1 class="hero-title">
+            The Cyber-Fresh Supermarket
+            <span class="gradient-text">Delivered In Crates.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            Skip the checkout lines. Source hyper-local organic harvest, sustainable proteins, and artisan baked goods packed into temperature-shielded crates and delivered by drone in minutes.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#store-aisles" class="btn-primary">
+              <span>Shop All Aisles</span>
+              <span>↓</span>
+            </a>
+            <a href="#crate-builder" class="btn-secondary">
+              <span>🛠️ Build Your Own Crate</span>
+            </a>
+          </div>
+
+          <div class="hero-perks">
+            <div class="perk-item">
+              <span class="perk-icon">⚡</span>
+              <div class="perk-text">
+                <h4>15-Min Delivery</h4>
+                <p>Autonomous drone hubs</p>
+              </div>
+            </div>
+            <div class="perk-item">
+              <span class="perk-icon">🌿</span>
+              <div class="perk-text">
+                <h4>100% Non-GMO</h4>
+                <p>Direct from local farms</p>
+              </div>
+            </div>
+            <div class="perk-item">
+              <span class="perk-icon">❄️</span>
+              <div class="perk-text">
+                <h4>Cold-Shield Crates</h4>
+                <p>Triple-insulated boxes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Floating Showcase Card -->
+        <div class="hero-card-showcase">
+          <div class="crate-floating-card">
+            <div class="crate-showcase-badge">Featured Crate</div>
+            <img 
+              src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" 
+              alt="Harvest Organic Crate" 
+              class="crate-showcase-img" 
+            />
+            <div class="crate-showcase-info">
+              <h3>Neon Harvest Organic Crate</h3>
+              <p>10 Handpicked Farm Essentials: Greens, Haas Avocados, Heirloom Tomatoes & Wild Honey.</p>
+              <div class="crate-showcase-footer">
+                <div class="crate-price-wrap">
+                  <span class="price-now">$38.99</span>
+                  <span class="price-old">$46.99</span>
+                </div>
+                <button class="btn-primary" onclick="window.document.querySelector('[data-id=crate-harvest] .add-btn')?.click() || alert('Added to crate!')">
+                  + Add Crate 🛒
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Interactive "Build Your Own Crate" Studio
+       ========================================================================== -->
+  <section class="custom-crate-section" id="crate-builder">
+    <div class="container">
+      <div class="custom-crate-box">
+        
+        <div class="crate-builder-header">
+          <span class="section-tag">Custom Bundle Studio</span>
+          <h2>Build Your Signature Crate & Save 15%</h2>
+          <p>Choose your crate style, select 4 farm-fresh essentials, and enjoy an instant automatic 15% bundle discount!</p>
+        </div>
+
+        <!-- Crate Box Type Selector -->
+        <div class="crate-type-picker">
+          <div class="crate-type-card selected" data-box-name="Cyber-Insulated Coolbox ❄️">
+            <div class="crate-type-icon">🧊</div>
+            <h4>Cyber Coolbox</h4>
+            <span>Temperature Shielded (-2°C to 4°C)</span>
+          </div>
+          <div class="crate-type-card" data-box-name="Artisan Wooden Crate 🪵">
+            <div class="crate-type-icon">🪵</div>
+            <h4>Vintage Wood Crate</h4>
+            <span>Rustic Reclaimed Cedarwood</span>
+          </div>
+          <div class="crate-type-card" data-box-name="Zero-Waste Eco Bamboo 🎋">
+            <div class="crate-type-icon">🎋</div>
+            <h4>Eco-Bamboo Crate</h4>
+            <span>100% Biodegradable & Plantable</span>
+          </div>
+        </div>
+
+        <!-- Workflow Grid: Picker & Tray -->
+        <div class="crate-builder-workflow">
+          
+          <!-- Left: Grocery Item Picker -->
+          <div class="builder-pick-list">
+            <h4>
+              <span>Pick Any Items to Pack:</span>
+              <span style="font-size:0.8rem;color:var(--neon-green);">Click to add (+)</span>
+            </h4>
+            <div class="builder-items-grid" id="builderItemsGrid">
+              <!-- Dynamically rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Right: Crate Assembly Tray -->
+          <div class="crate-assembly-tray">
+            <div class="tray-title-row">
+              <h4>📦 Your Packed Crate</h4>
+              <span id="trayCounter" style="font-weight:700;font-size:0.85rem;color:var(--text-secondary);">0/4 Selected</span>
+            </div>
+
+            <div class="tray-slots">
+              <div class="tray-slot" data-slot="0"></div>
+              <div class="tray-slot" data-slot="1"></div>
+              <div class="tray-slot" data-slot="2"></div>
+              <div class="tray-slot" data-slot="3"></div>
+            </div>
+
+            <div class="crate-summary-bar">
+              <div class="summary-row">
+                <span>Standard Items Total:</span>
+                <span id="crateOriginalPrice">$0.00</span>
+              </div>
+              <div class="summary-row" style="color:var(--neon-green);">
+                <span>Bundle Discount (15% OFF):</span>
+                <span id="crateDiscountNotice">-15% Applied</span>
+              </div>
+              <div class="summary-row total">
+                <span>Custom Crate Total:</span>
+                <span id="crateBundlePrice">$0.00</span>
+              </div>
+              <button class="btn-primary btn-add-custom-crate" id="addCustomCrateBtn" disabled>
+                Pack & Add Custom Crate to Cart 🚀
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Store Products & Aisles
+       ========================================================================== -->
+  <section class="store-section" id="store-aisles">
+    <div class="container">
+      
+      <!-- Section Title & Filter Bar -->
+      <div class="section-header">
+        <div class="section-title">
+          <h2>Fresh Grocery Aisles</h2>
+          <p id="productCountLabel">Showing all fresh items</p>
+        </div>
+
+        <!-- Dietary Filter Pills -->
+        <div class="dietary-tags-group">
+          <button class="tag-btn active" data-tag="all">All Diets</button>
+          <button class="tag-btn" data-tag="organic">🌿 100% Organic</button>
+          <button class="tag-btn" data-tag="vegan">🌱 Pure Vegan</button>
+          <button class="tag-btn" data-tag="gluten-free">🌾 Gluten-Free</button>
+          <button class="tag-btn" data-tag="high-protein">💪 High Protein</button>
+        </div>
+
+        <!-- Sort Dropdown -->
+        <div class="sort-group">
+          <label for="sortSelect">Sort by:</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="featured">Featured & Best</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Highest Rated ⭐</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Product Grid -->
+      <div class="product-grid" id="productGrid">
+        <!-- Injected dynamically via JS -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+     Slide-Out Cart Drawer & Backdrop
+     ========================================================================== -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping Cart">
+    
+    <!-- Drawer Header -->
+    <div class="cart-drawer-header">
+      <h3>
+        <span>🛒 Your Neon Crate</span>
+        <span id="cartHeaderCount" style="color:var(--neon-green);font-size:1.1rem;">(0)</span>
+      </h3>
+      <button class="close-btn" id="cartCloseBtn" title="Close Cart">✕</button>
+    </div>
+
+    <!-- Free Delivery Progress Meter -->
+    <div class="free-shipping-bar">
+      <div class="shipping-progress-text" id="freeShippingText">
+        Add <strong>$45.00</strong> more for <strong>FREE 15-Min Drone Delivery</strong>!
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="freeShippingProgress"></div>
+      </div>
+    </div>
+
+    <!-- Items List -->
+    <div class="cart-items-list" id="cartItemsList">
+      <!-- Injected dynamically via JS -->
+    </div>
+
+    <!-- Drawer Footer & Checkout Action -->
+    <div class="cart-drawer-footer">
+      
+      <!-- Promo Code Box -->
+      <div class="promo-form">
+        <input 
+          type="text" 
+          id="promoInput" 
+          class="promo-input" 
+          placeholder="Promo code (Try: NEON20)" 
+        />
+        <button class="promo-btn" id="promoApplyBtn">Apply</button>
+      </div>
+
+      <!-- Applied Promo Banner -->
+      <div id="appliedPromoBanner" class="applied-promo-tag" style="display:none;"></div>
+
+      <!-- Pricing Summary -->
+      <div class="cart-bill-details">
+        <div class="bill-line">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">$0.00</span>
+        </div>
+        <div class="bill-line">
+          <span>Express Delivery Fee</span>
+          <span id="cartDeliveryFee">$4.99</span>
+        </div>
+        <div class="bill-line discount" id="cartDiscountRow" style="display:none;">
+          <span>Discount Applied</span>
+          <span id="cartDiscountAmount">-$0.00</span>
+        </div>
+        <div class="bill-line">
+          <span>Estimated Taxes (8%)</span>
+          <span id="cartTax">$0.00</span>
+        </div>
+        <div class="bill-line total-line">
+          <span>Estimated Total</span>
+          <span class="amount" id="cartGrandTotal">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Checkout Trigger -->
+      <button class="btn-primary btn-checkout" id="checkoutBtn">
+        Proceed to Checkout ⚡
+      </button>
+
+    </div>
+
+  </aside>
+
+  <!-- ==========================================================================
+       Quick View Product Modal
+       ========================================================================== -->
+  <div class="modal-wrapper" id="quickViewModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="quickViewCloseBtn">✕</button>
+      <div id="quickViewContainer">
+        <!-- Injected dynamically via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Checkout Flow Modal
+       ========================================================================== -->
+  <div class="modal-wrapper" id="checkoutModal">
+    <div class="modal-card checkout-modal-card">
+      <button class="modal-close-btn" id="checkoutCloseBtn">✕</button>
+
+      <h3>⚡ Instant Express Checkout</h3>
+      <p class="step-sub">Autonomous drone and dispatch hub ready.</p>
+
+      <form id="checkoutForm">
+        
+        <!-- Delivery Slots -->
+        <div class="checkout-form-group">
+          <label>Select Delivery Window:</label>
+          <div class="delivery-slots-grid">
+            <div class="slot-radio-card active">
+              <div class="slot-icon">🛸</div>
+              <div class="slot-name">Drone Express</div>
+              <div class="slot-time">15 - 20 Mins</div>
+            </div>
+            <div class="slot-radio-card">
+              <div class="slot-icon">🌆</div>
+              <div class="slot-name">Evening Prime</div>
+              <div class="slot-time">6:00 - 8:00 PM</div>
+            </div>
+            <div class="slot-radio-card">
+              <div class="slot-icon">🌅</div>
+              <div class="slot-name">Morning Slot</div>
+              <div class="slot-time">Tomorrow 8-10 AM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Name -->
+        <div class="checkout-form-group">
+          <label for="custName">Full Name</label>
+          <input type="text" id="custName" class="checkout-input" placeholder="e.g. Alex Morgan" required value="Alex Morgan" />
+        </div>
+
+        <!-- Customer Address -->
+        <div class="checkout-form-group">
+          <label for="custAddress">Delivery Address & Landing Pad / Apt</label>
+          <input type="text" id="custAddress" class="checkout-input" placeholder="e.g. 742 Evergreen Terrace, Apt 4B" required value="742 Evergreen Terrace, Penthouse B" />
+        </div>
+
+        <!-- Customer Phone -->
+        <div class="checkout-form-group">
+          <label for="custPhone">Mobile for Live Drone SMS Alerts</label>
+          <input type="tel" id="custPhone" class="checkout-input" placeholder="e.g. +1 (555) 019-2834" required value="+1 (555) 839-2041" />
+        </div>
+
+        <!-- Payment Method -->
+        <div class="checkout-form-group">
+          <label>Payment Method:</label>
+          <div class="payment-methods-grid">
+            <div class="pay-card active">
+              <div style="font-size:1.4rem;">⚡</div>
+              <div style="font-size:0.8rem;font-weight:700;">NeonPay 1-Click</div>
+            </div>
+            <div class="pay-card">
+              <div style="font-size:1.4rem;">💳</div>
+              <div style="font-size:0.8rem;font-weight:700;">Credit / Debit</div>
+            </div>
+            <div class="pay-card">
+              <div style="font-size:1.4rem;">💵</div>
+              <div style="font-size:0.8rem;font-weight:700;">Cash / POD</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total & Submit -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-subtle);">
+          <div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Amount Due:</div>
+            <div id="checkoutSummaryTotal" style="font-size:1.5rem;font-weight:800;color:var(--neon-green);font-family:var(--font-heading);">$0.00</div>
+          </div>
+          <button type="submit" class="btn-primary" style="padding:0.85rem 1.8rem;">
+            Place Order & Launch Drone 🛸
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Live Drone Tracking Modal Simulation
+       ========================================================================== -->
+  <div class="modal-wrapper" id="droneTrackerModal">
+    <div class="modal-card tracker-modal-card">
+      <button class="modal-close-btn" id="droneCloseBtn">✕</button>
+
+      <div class="drone-status-badge">
+        <span class="pulse-dot"></span>
+        <span>LIVE DRONE FLIGHT SIMULATION</span>
+      </div>
+
+      <h2>Order En Route! 🛸</h2>
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.5rem;">
+        Order Code: <span class="order-code" id="droneOrderCode">NC-893120</span>
+      </p>
+      <div id="droneItemsSummary" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;"></div>
+
+      <!-- Animated Delivery Timeline -->
+      <div class="delivery-timeline">
+        <div class="timeline-step completed" id="step-1">
+          <div class="step-bubble">📦</div>
+          <div class="step-label">Packed</div>
+        </div>
+        <div class="timeline-step active" id="step-2">
+          <div class="step-bubble">🛸</div>
+          <div class="step-label">Dispatched</div>
+        </div>
+        <div class="timeline-step" id="step-3">
+          <div class="step-bubble">⚡</div>
+          <div class="step-label">In Flight (65 km/h)</div>
+        </div>
+        <div class="timeline-step" id="step-4">
+          <div class="step-bubble">🏡</div>
+          <div class="step-label">Delivered</div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-card);padding:1rem;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);margin-top:1.5rem;text-align:left;">
+        <div style="font-size:0.8rem;color:var(--neon-cyan);margin-bottom:0.3rem;">📍 Destination Address:</div>
+        <div id="droneDeliveryAddress" style="font-weight:600;font-size:0.9rem;">742 Evergreen Terrace</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">
+          Keep porch / landing zone clear. Estimated touchdown in 12 minutes.
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="document.getElementById('droneTrackerModal').classList.remove('active');" style="margin-top:1.5rem;width:100%;justify-content:center;">
+        Got it, Keep Shopping 🛒
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Toast Notifications Anchor -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ==========================================================================
+       Site Footer
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <div class="footer-col">
+          <a href="#" class="logo" style="margin-bottom:1rem;">
+            <div class="logo-box">📦</div>
+            <div class="logo-text">Neon<span>Crates</span></div>
+          </a>
+          <p>
+            The next-generation autonomous grocery store. Connecting local organic regenerative farms directly to your kitchen in cold-shielded crates.
+          </p>
+          <div style="display:flex;gap:0.75rem;font-size:1.2rem;">
+            <span>🌐</span>
+            <span>📱</span>
+            <span>💬</span>
+            <span>⚡</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Popular Aisles</h4>
+          <ul class="footer-links">
+            <li><a href="#store-aisles" onclick="document.querySelector('[data-category=crates]').click();">Signature Bundles</a></li>
+            <li><a href="#store-aisles" onclick="document.querySelector('[data-category=fruits]').click();">Neon Orchards</a></li>
+            <li><a href="#store-aisles" onclick="document.querySelector('[data-category=vegetables]').click();">Fresh Greens</a></li>
+            <li><a href="#store-aisles" onclick="document.querySelector('[data-category=proteins]').click();">Grass-Fed Proteins</a></li>
+            <li><a href="#store-aisles" onclick="document.querySelector('[data-category=bakery]').click();">Artisan Sourdough</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Help & Delivery</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)">15-Min Drone Coverage</a></li>
+            <li><a href="javascript:void(0)">Cold-Chain Quality Guarantee</a></li>
+            <li><a href="javascript:void(0)">Crate Box Return & Reuse</a></li>
+            <li><a href="javascript:void(0)">FAQ & Contact Support</a></li>
+            <li><a href="javascript:void(0)">Wholesale Partner Farms</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Get Fresh Deals</h4>
+          <p>Subscribe for weekly seasonal harvests and exclusive promo drop alerts.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed to NeonCrates drops!');">
+            <input type="email" class="newsletter-input" placeholder="Enter your email" required />
+            <button type="submit" class="btn-primary" style="padding:0.6rem 1rem;">Join</button>
+          </form>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.75rem;">
+            Use code <strong style="color:var(--neon-green);">NEON20</strong> at checkout for 20% off.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 NeonCrates Hypermarket Inc. All rights reserved.</div>
+        <div style="display:flex;gap:1.5rem;">
+          <a href="javascript:void(0)">Privacy Policy</a>
+          <a href="javascript:void(0)">Terms of Service</a>
+          <a href="javascript:void(0)">Drone Airway Compliance</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       User Account Authentication Modal (Sign In / Create Account)
+       ========================================================================== -->
+  <div class="modal-wrapper" id="authModal">
+    <div class="modal-card checkout-modal-card" style="max-width:500px;">
+      <button class="modal-close-btn" id="authCloseBtn">✕</button>
+
+      <div class="auth-tabs-header">
+        <div class="auth-tab-btn active" id="tabBtnSignIn">Sign In</div>
+        <div class="auth-tab-btn" id="tabBtnSignUp">Create Account</div>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="signInForm">
+        <div class="checkout-form-group">
+          <label for="signInEmail">Email Address</label>
+          <input type="email" id="signInEmail" class="checkout-input" placeholder="e.g. alex@neoncrate.io" required />
+        </div>
+        <div class="checkout-form-group">
+          <label for="signInPassword">Password</label>
+          <input type="password" id="signInPassword" class="checkout-input" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem;">
+          Sign In ⚡
+        </button>
+        <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:1rem;">
+          New to NeonCrates? <a href="javascript:void(0)" id="switchToSignUpLink" style="color:var(--neon-green);font-weight:bold;">Create an account</a>
+        </p>
+      </form>
+
+      <!-- Create Account Form -->
+      <form id="signUpForm" style="display:none;">
+        <div class="checkout-form-group">
+          <label for="signUpName">Full Name</label>
+          <input type="text" id="signUpName" class="checkout-input" placeholder="e.g. Sarah Connor" required />
+        </div>
+        <div class="checkout-form-group">
+          <label for="signUpPhone">Mobile Phone Number</label>
+          <input type="tel" id="signUpPhone" class="checkout-input" placeholder="e.g. +1 (555) 302-8492" required />
+        </div>
+        <div class="checkout-form-group">
+          <label for="signUpEmail">Email Address</label>
+          <input type="email" id="signUpEmail" class="checkout-input" placeholder="e.g. sarah@cybertech.io" required />
+        </div>
+        <div class="checkout-form-group">
+          <label for="signUpAddress">Default Delivery Address & Apt / Unit</label>
+          <input type="text" id="signUpAddress" class="checkout-input" placeholder="e.g. 1044 Neon Sky Blvd, Apt 7" required />
+        </div>
+        <div class="checkout-form-group">
+          <label for="signUpPassword">Create Password</label>
+          <input type="password" id="signUpPassword" class="checkout-input" placeholder="Choose a secure password" required minlength="4" />
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem;">
+          Create My Account 🚀
+        </button>
+        <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:1rem;">
+          Already have an account? <a href="javascript:void(0)" id="switchToSignInLink" style="color:var(--neon-green);font-weight:bold;">Sign In</a>
+        </p>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       User Profile & Past Orders Modal
+       ========================================================================== -->
+  <div class="modal-wrapper" id="profileModal">
+    <div class="modal-card profile-modal-card">
+      <button class="modal-close-btn" id="profileCloseBtn">✕</button>
+
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+        <div class="user-avatar-circle" style="width:48px;height:48px;font-size:1.3rem;" id="profAvatarDisplay">👤</div>
+        <div>
+          <h3 id="profHeaderName" style="font-size:1.4rem;">Customer Profile</h3>
+          <p id="profHeaderEmail" style="color:var(--text-muted);font-size:0.85rem;">user@example.com</p>
+        </div>
+      </div>
+
+      <!-- Edit Profile Info -->
+      <form id="profileUpdateForm" style="margin-bottom:2rem;background:var(--bg-card);padding:1.25rem;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
+        <h4 style="font-size:1rem;margin-bottom:1rem;color:var(--neon-cyan);">Saved Information (Auto-fills at Checkout)</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div class="checkout-form-group">
+            <label for="profName">Full Name</label>
+            <input type="text" id="profName" class="checkout-input" required />
+          </div>
+          <div class="checkout-form-group">
+            <label for="profPhone">Mobile Number</label>
+            <input type="tel" id="profPhone" class="checkout-input" required />
+          </div>
+        </div>
+        <div class="checkout-form-group">
+          <label for="profEmail">Email</label>
+          <input type="email" id="profEmail" class="checkout-input" required />
+        </div>
+        <div class="checkout-form-group">
+          <label for="profAddress">Default Delivery Address</label>
+          <input type="text" id="profAddress" class="checkout-input" required />
+        </div>
+        <button type="submit" class="btn-secondary" style="padding:0.6rem 1.25rem;font-size:0.85rem;">
+          Update Profile Information
+        </button>
+      </form>
+
+      <!-- Customer Orders History -->
+      <div>
+        <h4 style="font-size:1rem;margin-bottom:0.75rem;color:var(--neon-green);">My Orders History 📦</h4>
+        <div class="admin-table-wrap">
+          <table class="user-orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="userOrdersListBody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Admin Authentication & OTP Verification Modal (Protected)
+       ========================================================================== -->
+  <div class="modal-wrapper" id="adminAuthModal">
+    <div class="modal-card admin-auth-card">
+      <button class="modal-close-btn" id="adminAuthCloseBtn">✕</button>
+
+      <div class="admin-security-shield">🛡️</div>
+
+      <!-- Step 1: Admin Credentials Form -->
+      <div id="adminLoginStep">
+        <h3 style="font-size:1.4rem;margin-bottom:0.35rem;">Admin Access Portal</h3>
+        <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1.5rem;">
+          Restricted zone. Please verify your administrative identity.
+        </p>
+
+        <form id="adminCredentialsForm">
+          <div class="checkout-form-group" style="text-align:left;">
+            <label for="adminIdInput">Admin ID / Username</label>
+            <input type="text" id="adminIdInput" class="checkout-input" placeholder="e.g. admin" required value="admin" />
+          </div>
+          <div class="checkout-form-group" style="text-align:left;">
+            <label for="adminPassInput">Admin Password</label>
+            <input type="password" id="adminPassInput" class="checkout-input" placeholder="e.g. neonadmin2026" required value="neonadmin2026" />
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:0.75rem;">
+            Authenticate & Request OTP 🔐
+          </button>
+        </form>
+
+        <div class="demo-credentials-box">
+          <div style="font-weight:700;color:var(--neon-green);margin-bottom:0.25rem;">🔑 Default Demo Admin Credentials:</div>
+          <div>Admin ID: <strong>admin</strong></div>
+          <div>Password: <strong>neonadmin2026</strong></div>
+        </div>
+      </div>
+
+      <!-- Step 2: 2-Factor OTP Verification -->
+      <div id="adminOtpStep" style="display:none;">
+        <h3 style="font-size:1.4rem;margin-bottom:0.35rem;">Two-Factor OTP Verification</h3>
+        <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:0.75rem;">
+          A 6-digit one-time code was sent to the registered admin device:
+        </p>
+
+        <!-- Simulated display for demo convenience -->
+        <div style="font-size:0.82rem;color:var(--text-muted);">Generated Verification Code:</div>
+        <div class="otp-display-code" id="otpDisplayCode">------</div>
+
+        <form id="adminOtpForm">
+          <div class="checkout-form-group" style="margin-bottom:1.25rem;">
+            <input 
+              type="text" 
+              id="adminOtpInput" 
+              class="otp-input-single" 
+              placeholder="000000" 
+              maxlength="6" 
+              required 
+              autocomplete="off" 
+            />
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+            Verify OTP & Unlock Dashboard 🚀
+          </button>
+        </form>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;font-size:0.82rem;">
+          <a href="javascript:void(0)" id="resendOtpBtn" style="color:var(--neon-cyan);font-weight:600;">🔄 Resend New OTP</a>
+          <a href="javascript:void(0)" id="backToAdminLoginBtn" style="color:var(--text-muted);">← Back to ID/Password</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Admin Control Center Portal
+       ========================================================================== -->
+  <div class="modal-wrapper" id="adminModal">
+    <div class="modal-card admin-portal-card">
+      
+      <!-- Admin Header Bar -->
+      <div class="admin-header-bar">
+        <div class="admin-title-wrap">
+          <span style="font-size:1.6rem;">🛡️</span>
+          <div>
+            <h2>NeonCrates Control Center</h2>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Admin Store Manager & Live Orders Stream</div>
+          </div>
+          <span class="admin-live-badge"><span class="pulse-dot"></span> LIVE DISPATCH</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <button class="btn-lock-admin" id="adminLockBtn" title="Lock Admin Portal">
+            <span>🔒</span>
+            <span>Lock</span>
+          </button>
+          <button class="close-btn" id="adminCloseBtn" title="Exit Admin Portal">✕</button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="admin-nav-tabs">
+        <button class="admin-tab active" id="adminTabOverview">
+          <span>📊 Overview & KPIs</span>
+        </button>
+        <button class="admin-tab" id="adminTabOrders">
+          <span>📦 Incoming Orders</span>
+          <span class="admin-tab-count" id="adminPendingBadge">0</span>
+        </button>
+        <button class="admin-tab" id="adminTabInventory">
+          <span>🛒 Grocery Inventory</span>
+          <span style="font-size:0.75rem;opacity:0.8;" id="adminInventoryBadge">(24)</span>
+        </button>
+      </div>
+
+      <!-- Admin Tab 1: Overview & Analytics -->
+      <div class="admin-tab-content" id="adminContentOverview">
+        <div class="admin-kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-val" id="kpiRevenue">$0.00</div>
+            <div class="kpi-label">Gross Store Sales</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-val" id="kpiOrders">0</div>
+            <div class="kpi-label">Total Orders Placed</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-val" id="kpiUsers">0</div>
+            <div class="kpi-label">Registered Customers</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🥬</div>
+            <div class="kpi-val" id="kpiProducts">0</div>
+            <div class="kpi-label">Live Active Products</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-card);padding:1.5rem;border-radius:var(--radius-md);border:1px solid var(--border-subtle);margin-bottom:1.5rem;">
+          <h4 style="color:var(--neon-cyan);margin-bottom:0.5rem;font-size:1.1rem;">⚡ Autonomous Drone Hub Status</h4>
+          <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6;">
+            All 6 dispatch pads are active. Cold-chain refrigeration containers calibrated. Average customer fulfillment cycle: <strong>14.2 minutes</strong>.
+          </p>
+        </div>
+
+        <div style="background:var(--bg-card);padding:1.5rem;border-radius:var(--radius-md);border:1px solid var(--border-subtle);">
+          <h4 style="color:var(--neon-green);margin-bottom:0.75rem;font-size:1.1rem;">Recent Activity Feed</h4>
+          <div id="adminRecentActivityList" style="font-size:0.88rem;color:var(--text-secondary);display:flex;flex-direction:column;gap:0.5rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Tab 2: Live Orders Stream -->
+      <div class="admin-tab-content" id="adminContentOrders" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+          <h3 style="font-size:1.2rem;">Live Customer Orders</h3>
+          <span style="font-size:0.85rem;color:var(--text-muted);">Real-time status updates synced with customers</span>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Time</th>
+                <th>Customer & Phone</th>
+                <th>Delivery Address</th>
+                <th>Items Ordered</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Update Status</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Admin Tab 3: Inventory & Products -->
+      <div class="admin-tab-content" id="adminContentInventory" style="display:none;">
+        <div class="inventory-header-actions">
+          <div>
+            <h3 style="font-size:1.2rem;">Grocery Catalog & Stock</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);">List of all items available in customer store aisles</p>
+          </div>
+          <button class="btn-primary" id="openAddProductBtn" style="padding:0.6rem 1.25rem;font-size:0.88rem;">
+            ➕ Add New Grocery Item
+          </button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Unit / Weight</th>
+                <th>Price</th>
+                <th>Stock / Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Admin Add New Grocery Item Modal
+       ========================================================================== -->
+  <div class="modal-wrapper" id="addProductModal">
+    <div class="modal-card checkout-modal-card" style="max-width:640px;">
+      <button class="modal-close-btn" id="addProductCloseBtn">✕</button>
+
+      <h3>➕ Add New Grocery Item</h3>
+      <p class="step-sub">Instantly lists item across store aisles and search</p>
+
+      <form id="addNewProductForm">
+        
+        <div class="checkout-form-group">
+          <label for="newProdTitle">Product Title</label>
+          <input type="text" id="newProdTitle" class="checkout-input" placeholder="e.g. Organic Dragon Fruit Exotic" required />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div class="checkout-form-group">
+            <label for="newProdCategory">Store Aisle / Category</label>
+            <select id="newProdCategory" class="checkout-input">
+              <option value="fruits">🍎 Neon Orchards (Fruits)</option>
+              <option value="vegetables">🥬 Farm Greens (Vegetables)</option>
+              <option value="dairy">🥛 Dairy & Plant Milks</option>
+              <option value="bakery">🥖 Artisan Bakery</option>
+              <option value="proteins">🥩 Prime Proteins</option>
+              <option value="snacks">🍿 CyberSnacks & Drinks</option>
+              <option value="crates">📦 Signature Crates</option>
+            </select>
+          </div>
+          <div class="checkout-form-group">
+            <label for="newProdUnit">Unit / Size</label>
+            <input type="text" id="newProdUnit" class="checkout-input" placeholder="e.g. 500g Pack or 1 Litre" required />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div class="checkout-form-group">
+            <label for="newProdPrice">Selling Price ($)</label>
+            <input type="number" step="0.01" id="newProdPrice" class="checkout-input" placeholder="e.g. 6.49" required />
+          </div>
+          <div class="checkout-form-group">
+            <label for="newProdOriginalPrice">Original Price ($ optional)</label>
+            <input type="number" step="0.01" id="newProdOriginalPrice" class="checkout-input" placeholder="e.g. 7.99" />
+          </div>
+        </div>
+
+        <div class="checkout-form-group">
+          <label for="newProdImage">Image URL</label>
+          <input type="url" id="newProdImage" class="checkout-input" placeholder="https://images.unsplash.com/..." required value="https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=600&q=80" />
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Dietary Tags (Select all that apply):</label>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.85rem;color:var(--text-secondary);margin-top:0.3rem;">
+            <label><input type="checkbox" id="dietOrganic" checked /> 🌿 Organic</label>
+            <label><input type="checkbox" id="dietVegan" checked /> 🌱 Vegan</label>
+            <label><input type="checkbox" id="dietGlutenFree" checked /> 🌾 Gluten-Free</label>
+            <label><input type="checkbox" id="dietHighProtein" /> 💪 High Protein</label>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div class="checkout-form-group">
+            <label for="newProdOrigin">Farm Origin</label>
+            <input type="text" id="newProdOrigin" class="checkout-input" placeholder="e.g. Tropical Bio-Dome Orchards" value="Local Regenerative Co-op" />
+          </div>
+          <div class="checkout-form-group">
+            <label for="newProdShelfLife">Shelf Life</label>
+            <input type="text" id="newProdShelfLife" class="checkout-input" placeholder="e.g. 7 Days Chilled" value="7 Days Peak Freshness" />
+          </div>
+        </div>
+
+        <div class="checkout-form-group">
+          <label for="newProdDesc">Product Description</label>
+          <input type="text" id="newProdDesc" class="checkout-input" placeholder="Describe flavor, texture, culinary ideas" required value="Freshly harvested, vibrantly flavorful and packed with natural vitamins." />
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:1.25rem;">
+          Publish & List on Store 🚀
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>

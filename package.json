@@ -1,0 +1,22 @@
+{
+  "name": "neoncrates-grocery",
+  "version": "1.0.0",
+  "description": "NeonCrates - Cyber-Fresh Online Grocery Supermarket Full-Stack Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2"
+  },
+  "keywords": [
+    "grocery",
+    "ecommerce",
+    "supermarket",
+    "nodejs",
+    "fullstack"
+  ],
+  "author": "NeonCrates Hypermarket Inc.",
+  "license": "ISC"
+}

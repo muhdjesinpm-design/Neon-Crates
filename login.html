@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0f19" />
+  <title>Sign In | NeonCrates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: #0b0f19;
+      --surface: rgba(18, 28, 45, 0.78);
+      --surface-solid: #111a2a;
+      --mint: #00ff9d;
+      --mint-deep: #10b981;
+      --cyan: #60efff;
+      --text: #ffffff;
+      --muted: #9ca3af;
+      --border: rgba(16, 185, 129, 0.2);
+      --font-heading: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: var(--font-body);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(0, 255, 157, 0.09), transparent 30rem),
+        radial-gradient(circle at 90% 85%, rgba(96, 239, 255, 0.07), transparent 28rem),
+        var(--background);
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      opacity: 0.3;
+      background-image: linear-gradient(rgba(96, 239, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(96, 239, 255, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+
+    .login-card {
+      width: min(100%, 460px);
+      padding: clamp(1.5rem, 5vw, 2.75rem);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(24, 38, 59, 0.88), var(--surface));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45), 0 0 45px rgba(0, 255, 157, 0.06);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 2.25rem;
+      color: var(--text);
+      font-family: var(--font-heading);
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-decoration: none;
+    }
+
+    .brand span { color: var(--mint); }
+
+    .brand-badge {
+      display: grid;
+      width: 2.7rem;
+      height: 2.7rem;
+      place-items: center;
+      border: 1px solid rgba(0, 255, 157, 0.5);
+      border-radius: 11px;
+      color: #04120e;
+      font-size: 1.35rem;
+      background: linear-gradient(135deg, var(--mint), var(--cyan));
+      box-shadow: 0 0 20px rgba(0, 255, 157, 0.28);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 6vw, 2.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 0.7rem 0 2rem;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+
+    .field { margin-bottom: 1.15rem; }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #d1d5db;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      width: 1.05rem;
+      color: #6b7280;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      min-height: 3.1rem;
+      padding: 0.85rem 1rem 0.85rem 2.8rem;
+      border: 1px solid rgba(156, 163, 175, 0.22);
+      border-radius: 11px;
+      outline: none;
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+      background: rgba(5, 10, 19, 0.58);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    input::placeholder { color: #6b7280; }
+
+    input:focus {
+      border-color: var(--mint-deep);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16), 0 0 18px rgba(0, 255, 157, 0.08);
+    }
+
+    .password-input { padding-right: 3rem; }
+
+    .icon-button {
+      position: absolute;
+      top: 50%;
+      right: 0.85rem;
+      display: grid;
+      width: 1.6rem;
+      height: 1.6rem;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      color: #9ca3af;
+      background: transparent;
+      cursor: pointer;
+      transform: translateY(-50%);
+    }
+
+    .icon-button:hover, .icon-button:focus-visible { color: var(--mint); }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin: -0.25rem 0 1.35rem;
+    }
+
+    a {
+      color: var(--mint);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    a:hover { color: var(--cyan); text-decoration: underline; }
+
+    .primary-button, .social-button {
+      display: flex;
+      width: 100%;
+      min-height: 3.1rem;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      border-radius: 11px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .primary-button {
+      border: 0;
+      color: #000;
+      background: linear-gradient(135deg, #00ff9d, #10b981);
+      box-shadow: 0 8px 24px rgba(0, 255, 157, 0.18);
+    }
+
+    .primary-button:hover {
+      box-shadow: 0 0 26px rgba(0, 255, 157, 0.42);
+      transform: translateY(-1px);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin: 1.6rem 0 1.2rem;
+      color: #6b7280;
+      font-size: 0.72rem;
+    }
+
+    .divider::before, .divider::after {
+      flex: 1;
+      height: 1px;
+      content: "";
+      background: rgba(156, 163, 175, 0.18);
+    }
+
+    .social-button {
+      margin-top: 0.7rem;
+      border: 1px solid rgba(156, 163, 175, 0.2);
+      color: #e5e7eb;
+      background: rgba(5, 10, 19, 0.5);
+    }
+
+    .social-button:hover {
+      border-color: rgba(0, 255, 157, 0.45);
+      box-shadow: 0 0 18px rgba(0, 255, 157, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .social-icon { width: 1.1rem; height: 1.1rem; }
+
+    .create-account {
+      margin: 1.7rem 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    .create-account a { margin-left: 0.25rem; }
+
+    @media (max-width: 420px) {
+      body { padding: 1rem 0.75rem; }
+      .login-card { border-radius: 18px; }
+      .brand { margin-bottom: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card" aria-labelledby="login-title">
+    <a class="brand" href="index.html" aria-label="NeonCrates home">
+      <span class="brand-badge" aria-hidden="true">⌁</span>
+      Neon<span>Crates</span>
+    </a>
+
+    <h1 id="login-title">Welcome Back</h1>
+    <p class="subtitle">Access your cyber-fresh grocery account.</p>
+
+    <form action="#" method="post">
+      <div class="field">
+        <label for="email">Work / Personal Email</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
+            <path d="m3 7 9 6 9-6" />
+          </svg>
+          <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="10" rx="2" />
+            <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+          </svg>
+          <input class="password-input" id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required />
+          <button class="icon-button" id="toggle-password" type="button" aria-label="Show password" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+              <circle cx="12" cy="12" r="2.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button class="primary-button" type="submit">Sign In</button>
+    </form>
+
+    <div class="divider"><span>OR CONTINUE WITH</span></div>
+
+    <button class="social-button" type="button">
+      <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.35 12.23c0-.72-.06-1.25-.2-1.8H12v3.4h5.37a4.6 4.6 0 0 1-1.99 3.02v2.5h3.22c1.89-1.74 2.75-4.3 2.75-7.12Z"/><path fill="currentColor" d="M12 21.8c2.7 0 4.96-.88 6.61-2.4l-3.22-2.5c-.89.6-2.02.96-3.39.96-2.61 0-4.83-1.76-5.62-4.13H3.05v2.58A9.99 9.99 0 0 0 12 21.8Z"/><path fill="currentColor" d="M6.38 13.73A5.98 5.98 0 0 1 6.06 12c0-.6.11-1.18.32-1.73V7.69H3.05A9.99 9.99 0 0 0 2 12c0 1.61.39 3.13 1.05 4.31l3.33-2.58Z"/><path fill="currentColor" d="M12 6.14c1.47 0 2.78.51 3.82 1.5l2.86-2.86C16.95 3.17 14.7 2.2 12 2.2a9.99 9.99 0 0 0-8.95 5.49l3.33 2.58C7.17 7.9 9.39 6.14 12 6.14Z"/></svg>
+      Sign in with Google
+    </button>
+    <button class="social-button" type="button">
+      <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.4a9.6 9.6 0 0 0-3.04 18.71c.48.09.66-.21.66-.46v-1.64c-2.69.58-3.26-1.3-3.26-1.3-.44-1.12-1.07-1.42-1.07-1.42-.88-.6.07-.59.07-.59.97.07 1.48 1 1.48 1 .86 1.47 2.25 1.05 2.8.8.09-.62.34-1.05.61-1.29-2.15-.24-4.41-1.08-4.41-4.79 0-1.06.38-1.93 1-2.61-.1-.24-.43-1.24.1-2.58 0 0 .81-.26 2.64 1a9.14 9.14 0 0 1 4.8 0c1.83-1.25 2.64-1 2.64-1 .53 1.34.2 2.34.1 2.58.62.68 1 1.55 1 2.61 0 3.72-2.27 4.55-4.43 4.78.35.3.66.87.66 1.76v2.67c0 .26.17.56.67.46A9.6 9.6 0 0 0 12 2.4Z"/></svg>
+      Sign in with GitHub
+    </button>
+
+    <p id="login-message" class="create-account" role="status" aria-live="polite"></p>
+    <p class="create-account">New to NeonCrates?<a href="signup.html">Create a NeonCrates Account</a></p>
+  </main>
+
+  <script>
+    const passwordInput = document.getElementById("password");
+    const togglePassword = document.getElementById("toggle-password");
+    const loginForm = document.querySelector("form");
+    const loginMessage = document.getElementById("login-message");
+
+    togglePassword.addEventListener("click", () => {
+      const isVisible = passwordInput.type === "text";
+      passwordInput.type = isVisible ? "password" : "text";
+      togglePassword.setAttribute("aria-label", isVisible ? "Show password" : "Hide password");
+      togglePassword.setAttribute("aria-pressed", String(!isVisible));
+    });
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      loginMessage.textContent = "Connecting to NeonCrates...";
+      loginMessage.style.color = "#9ca3af";
+
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("email").value.trim(),
+            password: passwordInput.value
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Unable to sign in.");
+
+        localStorage.setItem("neon_crates_auth_token", result.token);
+        localStorage.setItem("neon_crates_current_user", JSON.stringify(result.user));
+        loginMessage.textContent = "Signed in. Redirecting...";
+        loginMessage.style.color = "#00ff9d";
+        window.location.href = "index.html";
+      } catch (error) {
+        loginMessage.textContent = error.message;
+        loginMessage.style.color = "#ff6b8a";
+      }
+    });
+  </script>
+</body>
+</html>

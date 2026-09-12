@@ -483,7 +483,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     users: JSON.parse(localStorage.getItem('neon_crates_users') || JSON.stringify(SEED_USERS)),
     currentUser: JSON.parse(localStorage.getItem('neon_crates_current_user') || 'null'),
     authToken: localStorage.getItem('neon_crates_auth_token') || null,
-    adminToken: localStorage.getItem('neon_crates_admin_token') || null,
     serverProducts: [],
     customProducts: JSON.parse(localStorage.getItem('neon_crates_custom_products') || '[]'),
     hiddenProductIds: JSON.parse(localStorage.getItem('neon_crates_hidden_products') || '[]'),
@@ -499,8 +498,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
       boxType: 'Cyber-Insulated Coolbox ❄️',
       items: []
     },
-    isAdminAuthenticated: false,
-    generatedOtp: null
   };
 
   const PROMO_CODES = {
@@ -544,23 +541,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     openUserOrdersItem: document.getElementById('openUserOrdersItem'),
     logoutItem: document.getElementById('logoutItem'),
 
-    // Auth Modal
-    authModal: document.getElementById('authModal'),
-    authCloseBtn: document.getElementById('authCloseBtn'),
-    tabBtnSignIn: document.getElementById('tabBtnSignIn'),
-    tabBtnSignUp: document.getElementById('tabBtnSignUp'),
-    signInForm: document.getElementById('signInForm'),
-    signInEmail: document.getElementById('signInEmail'),
-    signInPassword: document.getElementById('signInPassword'),
-    signUpForm: document.getElementById('signUpForm'),
-    signUpName: document.getElementById('signUpName'),
-    signUpPhone: document.getElementById('signUpPhone'),
-    signUpEmail: document.getElementById('signUpEmail'),
-    signUpAddress: document.getElementById('signUpAddress'),
-    signUpPassword: document.getElementById('signUpPassword'),
-    switchToSignUpLink: document.getElementById('switchToSignUpLink'),
-    switchToSignInLink: document.getElementById('switchToSignInLink'),
-
     // Profile Modal
     profileModal: document.getElementById('profileModal'),
     profileCloseBtn: document.getElementById('profileCloseBtn'),
@@ -574,23 +554,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     profAddress: document.getElementById('profAddress'),
     userOrdersListBody: document.getElementById('userOrdersListBody'),
 
-    // Admin Authentication & 2FA OTP
-    adminAuthModal: document.getElementById('adminAuthModal'),
-    adminAuthCloseBtn: document.getElementById('adminAuthCloseBtn'),
-    adminLoginStep: document.getElementById('adminLoginStep'),
-    adminOtpStep: document.getElementById('adminOtpStep'),
-    adminCredentialsForm: document.getElementById('adminCredentialsForm'),
-    adminIdInput: document.getElementById('adminIdInput'),
-    adminPassInput: document.getElementById('adminPassInput'),
-    otpDisplayCode: document.getElementById('otpDisplayCode'),
-    adminOtpForm: document.getElementById('adminOtpForm'),
-    adminOtpInput: document.getElementById('adminOtpInput'),
-    resendOtpBtn: document.getElementById('resendOtpBtn'),
-    backToAdminLoginBtn: document.getElementById('backToAdminLoginBtn'),
-
     // Admin Portal
-    adminPortalBtn: document.getElementById('adminPortalBtn'),
-    adminLockBtn: document.getElementById('adminLockBtn'),
     adminModal: document.getElementById('adminModal'),
     adminCloseBtn: document.getElementById('adminCloseBtn'),
     adminTabOverview: document.getElementById('adminTabOverview'),
@@ -705,13 +669,11 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     localStorage.setItem('neon_crates_theme', STATE.theme);
     if (STATE.authToken) localStorage.setItem('neon_crates_auth_token', STATE.authToken);
     else localStorage.removeItem('neon_crates_auth_token');
-    if (STATE.adminToken) localStorage.setItem('neon_crates_admin_token', STATE.adminToken);
-    else localStorage.removeItem('neon_crates_admin_token');
   }
 
   async function apiRequest(endpoint, options = {}) {
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-    const token = options.admin ? STATE.adminToken : STATE.authToken;
+    const token = options.admin ? null : STATE.authToken;
     if (token) headers.Authorization = `Bearer ${token}`;
     let response;
     try {
@@ -770,81 +732,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     }
   }
 
-  function openAuthModal(tab = 'signin') {
-    DOM.authModal.classList.add('active');
-    switchAuthTab(tab);
-  }
-
-  function closeAuthModal() {
-    DOM.authModal.classList.remove('active');
-  }
-
-  function switchAuthTab(tab) {
-    if (tab === 'signin') {
-      DOM.tabBtnSignIn.classList.add('active');
-      DOM.tabBtnSignUp.classList.remove('active');
-      DOM.signInForm.style.display = 'block';
-      DOM.signUpForm.style.display = 'none';
-    } else {
-      DOM.tabBtnSignUp.classList.add('active');
-      DOM.tabBtnSignIn.classList.remove('active');
-      DOM.signUpForm.style.display = 'block';
-      DOM.signInForm.style.display = 'none';
-    }
-  }
-
-  async function handleSignIn(e) {
-    e.preventDefault();
-    const email = DOM.signInEmail.value.trim().toLowerCase();
-    const password = DOM.signInPassword.value.trim();
-
-    try {
-      const result = await apiRequest('/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password })
-      });
-      STATE.authToken = result.token;
-      STATE.currentUser = result.user;
-      saveState();
-      updateUserHeaderUI();
-      closeAuthModal();
-      DOM.signInForm.reset();
-      showToast(`Welcome back, <strong>${result.user.name}</strong>! ⚡`, 'success');
-    } catch (error) {
-      showToast(error.message, 'error');
-    }
-  }
-
-  async function handleSignUp(e) {
-    e.preventDefault();
-    const name = DOM.signUpName.value.trim();
-    const phone = DOM.signUpPhone.value.trim();
-    const email = DOM.signUpEmail.value.trim().toLowerCase();
-    const address = DOM.signUpAddress.value.trim();
-    const password = DOM.signUpPassword.value.trim();
-
-    if (!name || !phone || !email || !address || !password) {
-      showToast('Please fill in all registration fields.', 'error');
-      return;
-    }
-
-    try {
-      const result = await apiRequest('/signup', {
-        method: 'POST',
-        body: JSON.stringify({ name, phone, email, address, password })
-      });
-      STATE.authToken = result.token;
-      STATE.currentUser = result.user;
-      saveState();
-      updateUserHeaderUI();
-      closeAuthModal();
-      DOM.signUpForm.reset();
-      showToast(`Account created! Welcome to NeonCrates, <strong>${name}</strong>! 🎉`, 'success');
-    } catch (error) {
-      showToast(error.message, 'error');
-    }
-  }
-
   function handleSignOut() {
     STATE.currentUser = null;
     STATE.authToken = null;
@@ -856,7 +743,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
 
   function openProfileModal() {
     if (!STATE.currentUser) {
-      openAuthModal('signin');
+      window.location.href = 'login.html';
       return;
     }
     DOM.userDropdown.classList.remove('active');
@@ -945,21 +832,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     }).join('');
   }
 
-  /* ==========================================================================
-     Admin Portal Operations (Protected with ID, Password & 2FA OTP)
-     ========================================================================== */
-  function openAdminPortal() {
-    if (STATE.isAdminAuthenticated) {
-      refreshAdminData();
-      DOM.adminModal.classList.add('active');
-      switchAdminTab('overview');
-    } else {
-      openAdminAuthModal();
-    }
-  }
-
   async function refreshAdminData() {
-    if (!STATE.adminToken) return;
     try {
       const [orders, products] = await Promise.all([
         apiRequest('/api/admin/orders', { admin: true }),
@@ -975,82 +848,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
       renderCrateBuilder();
     } catch (error) {
       showToast(error.message, 'error');
-      if (error.message.toLowerCase().includes('unauthorized')) handleAdminLock();
     }
-  }
-
-  function openAdminAuthModal() {
-    DOM.adminLoginStep.style.display = 'block';
-    DOM.adminOtpStep.style.display = 'none';
-    DOM.adminAuthModal.classList.add('active');
-  }
-
-  function closeAdminAuthModal() {
-    DOM.adminAuthModal.classList.remove('active');
-  }
-
-  async function handleAdminCredentialsSubmit(e) {
-    e.preventDefault();
-    const adminId = DOM.adminIdInput.value.trim();
-    const adminPass = DOM.adminPassInput.value.trim();
-
-    try {
-      const result = await apiRequest('/api/admin/login', {
-        method: 'POST',
-        body: JSON.stringify({ username: adminId, password: adminPass })
-      });
-      STATE.generatedOtp = result.otpForConsole;
-      DOM.otpDisplayCode.textContent = result.otpForConsole;
-      DOM.adminOtpInput.value = '';
-      DOM.adminLoginStep.style.display = 'none';
-      DOM.adminOtpStep.style.display = 'block';
-      DOM.adminOtpInput.focus();
-      showToast('Admin credentials verified. Enter the one-time code.', 'info');
-    } catch (error) {
-      showToast(error.message, 'error');
-    }
-  }
-
-  async function handleAdminOtpSubmit(e) {
-    e.preventDefault();
-    const enteredOtp = DOM.adminOtpInput.value.trim();
-
-    try {
-      const result = await apiRequest('/api/admin/verify-otp', {
-        method: 'POST',
-        body: JSON.stringify({ username: DOM.adminIdInput.value.trim(), otp: enteredOtp })
-      });
-      STATE.adminToken = result.adminToken;
-      STATE.isAdminAuthenticated = true;
-      saveState();
-      closeAdminAuthModal();
-      DOM.adminModal.classList.add('active');
-      switchAdminTab('overview');
-      showToast('Identity verified! Welcome to NeonCrates Control Center 🛡️', 'success');
-    } catch (error) {
-      showToast(error.message, 'error');
-      DOM.adminOtpInput.focus();
-    }
-  }
-
-  function handleResendOtp() {
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
-    STATE.generatedOtp = otp;
-    DOM.otpDisplayCode.textContent = otp;
-    showToast(`🔄 New 2FA OTP Code Generated: [${otp}]`, 'info');
-  }
-
-  function handleAdminLock() {
-    STATE.isAdminAuthenticated = false;
-    STATE.generatedOtp = null;
-    STATE.adminToken = null;
-    saveState();
-    closeAdminPortal();
-    showToast('Admin Portal session locked 🔒', 'info');
-  }
-
-  function closeAdminPortal() {
-    DOM.adminModal.classList.remove('active');
   }
 
   function switchAdminTab(tab) {
@@ -1926,7 +1724,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
       if (STATE.currentUser) {
         DOM.userDropdown.classList.toggle('active');
       } else {
-        openAuthModal('signin');
+        window.location.href = 'login.html';
       }
     });
 
@@ -1941,32 +1739,9 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     DOM.openUserOrdersItem.addEventListener('click', openProfileModal);
     DOM.logoutItem.addEventListener('click', handleSignOut);
 
-    // Auth Modal Switching & Forms
-    DOM.authCloseBtn.addEventListener('click', closeAuthModal);
-    DOM.tabBtnSignIn.addEventListener('click', () => switchAuthTab('signin'));
-    DOM.tabBtnSignUp.addEventListener('click', () => switchAuthTab('signup'));
-    DOM.switchToSignUpLink.addEventListener('click', () => switchAuthTab('signup'));
-    DOM.switchToSignInLink.addEventListener('click', () => switchAuthTab('signin'));
-
-    DOM.signInForm.addEventListener('submit', handleSignIn);
-    DOM.signUpForm.addEventListener('submit', handleSignUp);
-
     // Profile Modal Events
     DOM.profileCloseBtn.addEventListener('click', closeProfileModal);
     DOM.profileUpdateForm.addEventListener('submit', handleProfileUpdate);
-
-    // Admin Security & Portal Events
-    DOM.adminPortalBtn.addEventListener('click', openAdminPortal);
-    DOM.adminAuthCloseBtn.addEventListener('click', closeAdminAuthModal);
-    DOM.adminCredentialsForm.addEventListener('submit', handleAdminCredentialsSubmit);
-    DOM.adminOtpForm.addEventListener('submit', handleAdminOtpSubmit);
-    DOM.resendOtpBtn.addEventListener('click', handleResendOtp);
-    DOM.backToAdminLoginBtn.addEventListener('click', () => {
-      DOM.adminLoginStep.style.display = 'block';
-      DOM.adminOtpStep.style.display = 'none';
-    });
-    DOM.adminLockBtn.addEventListener('click', handleAdminLock);
-    DOM.adminCloseBtn.addEventListener('click', closeAdminPortal);
 
     DOM.adminTabOverview.addEventListener('click', () => switchAdminTab('overview'));
     DOM.adminTabOrders.addEventListener('click', () => switchAdminTab('orders'));
@@ -2119,7 +1894,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     });
 
     // Modal Background Clicks to Dismiss
-    [DOM.quickViewModal, DOM.checkoutModal, DOM.droneTrackerModal, DOM.authModal, DOM.profileModal, DOM.adminModal, DOM.addProductModal, DOM.adminAuthModal].forEach(modal => {
+    [DOM.quickViewModal, DOM.checkoutModal, DOM.droneTrackerModal, DOM.profileModal, DOM.adminModal, DOM.addProductModal].forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.classList.remove('active');
       });

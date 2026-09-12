@@ -19,9 +19,6 @@ const DEFAULT_DB = { admin: {}, users: [], products: [], orders: [] };
 const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
 
-// Active 2FA OTP Memory Store (maps adminId -> { otp, expiresAt, attempts })
-const activeOtps = new Map();
-
 // Latest security events log (in-memory circular log for audit)
 const securityLog = [];
 
@@ -473,100 +470,6 @@ app.use(async (req, res, next) => {
       } catch (e) {
         return sendError(res, 500, e.message);
       }
-    }
-
-    // --- Admin Authentication Step 1: Login & Request 2FA OTP ---
-    if (pathname === '/api/admin/login' && method === 'POST') {
-      try {
-        const body = req.body || {};
-        const { username, password } = body;
-
-        const db = loadDB();
-        const admin = db.admin || { username: 'admin' };
-
-        // Verify password against stored hash or fallback default
-        const expectedHash = admin.passwordHash || hashPassword('neonadmin2026', 'neonsec_salt_2026');
-        const inputHash = hashPassword(password || '', admin.salt || 'neonsec_salt_2026');
-
-        if (username !== admin.username || inputHash !== expectedHash) {
-          logSecurity(`Failed admin login attempt for user "${username}" from IP ${req.socket.remoteAddress}`);
-          return sendError(res, 401, 'Invalid Admin credentials.');
-        }
-
-        // Generate dynamic 6-digit cryptographic OTP
-        const otp = String(crypto.randomInt(100000, 999999));
-        const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
-
-        activeOtps.set(username, { otp, expiresAt, attempts: 0 });
-
-        console.log('\n=================================================================');
-        console.log(`[NEONCRATES AUTH] 🛡️ 2FA One-Time Passcode (OTP) Generated:`);
-        console.log(`-> Passcode:  [  ${otp}  ]`);
-        console.log(`-> Dispatched to: ${admin.email || 'security@neoncrate.io'} / ${admin.phone || '+1 (555) 019-9021'}`);
-        console.log(`-> Expiration: 5 minutes (${new Date(expiresAt).toLocaleTimeString()})`);
-        console.log('=================================================================\n');
-
-        logSecurity(`2FA OTP generated for Admin user "${username}". Code dispatched to admin secure terminal.`);
-
-        return sendJSON(res, 200, {
-          success: true,
-          message: 'Admin credentials verified. 2FA OTP has been dispatched to the secure Admin console/device.',
-          // Also include the real OTP for local testing ease without needing a separate SMS provider
-          otpForConsole: otp
-        });
-      } catch (e) {
-        return sendError(res, 500, e.message);
-      }
-    }
-
-    // --- Admin Authentication Step 2: Verify 2FA OTP ---
-    if (pathname === '/api/admin/verify-otp' && method === 'POST') {
-      try {
-        const body = req.body || {};
-        const { username, otp } = body;
-
-        const record = activeOtps.get(username || 'admin');
-        if (!record) {
-          return sendError(res, 401, 'No active OTP session found. Please request a new OTP code.');
-        }
-
-        if (Date.now() > record.expiresAt) {
-          activeOtps.delete(username || 'admin');
-          return sendError(res, 401, 'OTP code has expired. Please request a new OTP code.');
-        }
-
-        if (record.otp !== String(otp).trim()) {
-          record.attempts = (record.attempts || 0) + 1;
-          if (record.attempts >= 4) {
-            activeOtps.delete(username || 'admin');
-            logSecurity(`Admin 2FA locked out due to multiple failed OTP attempts.`);
-            return sendError(res, 429, 'Too many failed OTP attempts. Session terminated.');
-          }
-          return sendError(res, 401, 'Incorrect OTP verification code. Check your server terminal/device.');
-        }
-
-        // OTP Verified successfully!
-        activeOtps.delete(username || 'admin');
-
-        // Issue 12-hour signed Admin token
-        const adminToken = signToken({ role: 'admin', username: username || 'admin' }, 12 * 3600 * 1000);
-        logSecurity(`Admin "${username || 'admin'}" successfully authenticated via 2FA OTP.`);
-
-        return sendJSON(res, 200, {
-          success: true,
-          adminToken,
-          message: 'Two-factor authentication verified successfully.'
-        });
-      } catch (e) {
-        return sendError(res, 500, e.message);
-      }
-    }
-
-    // --- Admin: Verify Active Session (/api/admin/verify-session) ---
-    if (pathname === '/api/admin/verify-session' && method === 'GET') {
-      const admin = getAdminFromReq(req);
-      if (!admin) return sendError(res, 401, 'Invalid or expired admin session.');
-      return sendJSON(res, 200, { success: true, admin: admin.username });
     }
 
     // --- Products: List All (Public) ---

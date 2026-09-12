@@ -73,12 +73,6 @@
             </div>
           </div>
 
-          <!-- Admin Portal Trigger -->
-          <button class="admin-badge-btn" id="adminPortalBtn" title="Open Store Management Portal">
-            <span>🛡️</span>
-            <span>Admin</span>
-          </button>
-
           <!-- Theme Toggle -->
           <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
             <span id="themeIcon">☀️</span>
@@ -635,69 +629,6 @@
   </footer>
 
   <!-- ==========================================================================
-       User Account Authentication Modal (Sign In / Create Account)
-       ========================================================================== -->
-  <div class="modal-wrapper" id="authModal">
-    <div class="modal-card checkout-modal-card" style="max-width:500px;">
-      <button class="modal-close-btn" id="authCloseBtn">✕</button>
-
-      <div class="auth-tabs-header">
-        <div class="auth-tab-btn active" id="tabBtnSignIn">Sign In</div>
-        <div class="auth-tab-btn" id="tabBtnSignUp">Create Account</div>
-      </div>
-
-      <!-- Sign In Form -->
-      <form id="signInForm">
-        <div class="checkout-form-group">
-          <label for="signInEmail">Email Address</label>
-          <input type="email" id="signInEmail" class="checkout-input" placeholder="e.g. alex@neoncrate.io" required />
-        </div>
-        <div class="checkout-form-group">
-          <label for="signInPassword">Password</label>
-          <input type="password" id="signInPassword" class="checkout-input" placeholder="Enter your password" required />
-        </div>
-        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem;">
-          Sign In ⚡
-        </button>
-        <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:1rem;">
-          New to NeonCrates? <a href="javascript:void(0)" id="switchToSignUpLink" style="color:var(--neon-green);font-weight:bold;">Create an account</a>
-        </p>
-      </form>
-
-      <!-- Create Account Form -->
-      <form id="signUpForm" style="display:none;">
-        <div class="checkout-form-group">
-          <label for="signUpName">Full Name</label>
-          <input type="text" id="signUpName" class="checkout-input" placeholder="e.g. Sarah Connor" required />
-        </div>
-        <div class="checkout-form-group">
-          <label for="signUpPhone">Mobile Phone Number</label>
-          <input type="tel" id="signUpPhone" class="checkout-input" placeholder="e.g. +1 (555) 302-8492" required />
-        </div>
-        <div class="checkout-form-group">
-          <label for="signUpEmail">Email Address</label>
-          <input type="email" id="signUpEmail" class="checkout-input" placeholder="e.g. sarah@cybertech.io" required />
-        </div>
-        <div class="checkout-form-group">
-          <label for="signUpAddress">Default Delivery Address & Apt / Unit</label>
-          <input type="text" id="signUpAddress" class="checkout-input" placeholder="e.g. 1044 Neon Sky Blvd, Apt 7" required />
-        </div>
-        <div class="checkout-form-group">
-          <label for="signUpPassword">Create Password</label>
-          <input type="password" id="signUpPassword" class="checkout-input" placeholder="Choose a secure password" required minlength="4" />
-        </div>
-        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:1rem;">
-          Create My Account 🚀
-        </button>
-        <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:1rem;">
-          Already have an account? <a href="javascript:void(0)" id="switchToSignInLink" style="color:var(--neon-green);font-weight:bold;">Sign In</a>
-        </p>
-      </form>
-
-    </div>
-  </div>
-
-  <!-- ==========================================================================
        User Profile & Past Orders Modal
        ========================================================================== -->
   <div class="modal-wrapper" id="profileModal">
@@ -765,77 +696,6 @@
   <!-- ==========================================================================
        Admin Authentication & OTP Verification Modal (Protected)
        ========================================================================== -->
-  <div class="modal-wrapper" id="adminAuthModal">
-    <div class="modal-card admin-auth-card">
-      <button class="modal-close-btn" id="adminAuthCloseBtn">✕</button>
-
-      <div class="admin-security-shield">🛡️</div>
-
-      <!-- Step 1: Admin Credentials Form -->
-      <div id="adminLoginStep">
-        <h3 style="font-size:1.4rem;margin-bottom:0.35rem;">Admin Access Portal</h3>
-        <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1.5rem;">
-          Restricted zone. Please verify your administrative identity.
-        </p>
-
-        <form id="adminCredentialsForm">
-          <div class="checkout-form-group" style="text-align:left;">
-            <label for="adminIdInput">Admin ID / Username</label>
-            <input type="text" id="adminIdInput" class="checkout-input" placeholder="e.g. admin" required value="admin" />
-          </div>
-          <div class="checkout-form-group" style="text-align:left;">
-            <label for="adminPassInput">Admin Password</label>
-            <input type="password" id="adminPassInput" class="checkout-input" placeholder="e.g. neonadmin2026" required value="neonadmin2026" />
-          </div>
-          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:0.75rem;">
-            Authenticate & Request OTP 🔐
-          </button>
-        </form>
-
-        <div class="demo-credentials-box">
-          <div style="font-weight:700;color:var(--neon-green);margin-bottom:0.25rem;">🔑 Default Demo Admin Credentials:</div>
-          <div>Admin ID: <strong>admin</strong></div>
-          <div>Password: <strong>neonadmin2026</strong></div>
-        </div>
-      </div>
-
-      <!-- Step 2: 2-Factor OTP Verification -->
-      <div id="adminOtpStep" style="display:none;">
-        <h3 style="font-size:1.4rem;margin-bottom:0.35rem;">Two-Factor OTP Verification</h3>
-        <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:0.75rem;">
-          A 6-digit one-time code was sent to the registered admin device:
-        </p>
-
-        <!-- Simulated display for demo convenience -->
-        <div style="font-size:0.82rem;color:var(--text-muted);">Generated Verification Code:</div>
-        <div class="otp-display-code" id="otpDisplayCode">------</div>
-
-        <form id="adminOtpForm">
-          <div class="checkout-form-group" style="margin-bottom:1.25rem;">
-            <input 
-              type="text" 
-              id="adminOtpInput" 
-              class="otp-input-single" 
-              placeholder="000000" 
-              maxlength="6" 
-              required 
-              autocomplete="off" 
-            />
-          </div>
-          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
-            Verify OTP & Unlock Dashboard 🚀
-          </button>
-        </form>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;font-size:0.82rem;">
-          <a href="javascript:void(0)" id="resendOtpBtn" style="color:var(--neon-cyan);font-weight:600;">🔄 Resend New OTP</a>
-          <a href="javascript:void(0)" id="backToAdminLoginBtn" style="color:var(--text-muted);">← Back to ID/Password</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
   <!-- ==========================================================================
        Admin Control Center Portal
        ========================================================================== -->

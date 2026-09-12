@@ -1,13 +1,11 @@
 /**
  * NeonCrates - Cyber-Fresh Online Grocery Supermarket Full-Stack Server
  * Real Node.js REST API Backend & Static File Server
- * Uses Express for standalone authentication routes and native Node.js routing
+ * Uses Express for authentication, API routing, and static files
  */
 
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
 const crypto = require('crypto');
 const express = require('express');
 const bcrypt = require('bcryptjs');
@@ -25,7 +23,7 @@ const activeOtps = new Map();
 const securityLog = [];
 
 // Express handles the beginner-friendly standalone login and signup pages.
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 function publicUser(user) {
   return {
     id: user.id,
@@ -36,7 +34,7 @@ function publicUser(user) {
   };
 }
 
-authApp.post('/signup', async (req, res) => {
+app.post('/signup', async (req, res) => {
   try {
     const { name, phone = '', address = '', email, password } = req.body || {};
     const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
@@ -77,7 +75,7 @@ authApp.post('/signup', async (req, res) => {
   }
 });
 
-authApp.post('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
     const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
@@ -184,17 +182,11 @@ function verifyToken(token) {
    Request & Response Helpers
    ========================================================================== */
 function sendJSON(res, statusCode, data) {
-  res.writeHead(statusCode, {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-  });
-  res.end(JSON.stringify(data));
+  return res.status(statusCode).json(data);
 }
 
 function sendError(res, statusCode, message) {
-  sendJSON(res, statusCode, { error: message });
+  return sendJSON(res, statusCode, { error: message });
 }
 
 function parseJSONBody(req) {
@@ -292,29 +284,23 @@ function serveStaticFile(req, res, pathname) {
     stream.pipe(res);
   });
 }
-
 /* ==========================================================================
    HTTP Server Router
    ========================================================================== */
-const server = http.createServer(async (req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
+app.use(express.static(STATIC_DIR));
+
+app.get('/api/health', (req, res) => {
+  return sendJSON(res, 200, { status: 'healthy', time: new Date().toISOString() });
+});
+
+app.use(async (req, res, next) => {
+  const pathname = req.path;
   const method = req.method.toUpperCase();
 
   // Handle CORS Preflight
   if (method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-    });
-    res.end();
+    res.status(204).end();
     return;
-  }
-
-  // Standalone login.html and signup.html routes are handled by Express.
-  if ((pathname === '/login' || pathname === '/signup') && method === 'POST') {
-    return authApp(req, res);
   }
 
   // ==========================================================================
@@ -330,7 +316,7 @@ const server = http.createServer(async (req, res) => {
     // --- Customer Authentication: Register ---
     if (pathname === '/api/auth/register' && method === 'POST') {
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { name, phone, email, address, password } = body;
 
         if (!name || !phone || !email || !address || !password) {
@@ -381,7 +367,7 @@ const server = http.createServer(async (req, res) => {
     // --- Customer Authentication: Login ---
     if (pathname === '/api/auth/login' && method === 'POST') {
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { email, password } = body;
 
         if (!email || !password) {
@@ -443,7 +429,7 @@ const server = http.createServer(async (req, res) => {
       if (!userPayload) return sendError(res, 401, 'Unauthorized');
 
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const db = loadDB();
         const user = db.users.find(u => u.id === userPayload.id);
         if (!user) return sendError(res, 404, 'User profile not found');
@@ -472,7 +458,7 @@ const server = http.createServer(async (req, res) => {
     // --- Admin Authentication Step 1: Login & Request 2FA OTP ---
     if (pathname === '/api/admin/login' && method === 'POST') {
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { username, password } = body;
 
         const db = loadDB();
@@ -516,7 +502,7 @@ const server = http.createServer(async (req, res) => {
     // --- Admin Authentication Step 2: Verify 2FA OTP ---
     if (pathname === '/api/admin/verify-otp' && method === 'POST') {
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { username, otp } = body;
 
         const record = activeOtps.get(username || 'admin');
@@ -575,7 +561,7 @@ const server = http.createServer(async (req, res) => {
       if (!admin) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { title, category, unit, price, originalPrice, image, badges, dietary, origin, shelfLife, description } = body;
 
         if (!title || !category || !price) {
@@ -634,7 +620,7 @@ const server = http.createServer(async (req, res) => {
     // --- Orders: Place New Customer Order (Public or Customer) ---
     if (pathname === '/api/orders' && method === 'POST') {
       try {
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { name, phone, address, items, total, paymentMethod } = body;
 
         if (!name || !address || !items || !Array.isArray(items) || items.length === 0) {
@@ -700,7 +686,7 @@ const server = http.createServer(async (req, res) => {
       try {
         const parts = pathname.split('/');
         const orderId = parts[parts.length - 2];
-        const body = await parseJSONBody(req);
+        const body = req.body || {};
         const { status } = body;
 
         if (!status) return sendError(res, 400, 'Status field required');
@@ -745,19 +731,15 @@ const server = http.createServer(async (req, res) => {
   // ==========================================================================
   // Static Assets Fallback
   // ==========================================================================
-  serveStaticFile(req, res, pathname);
+  // Static files are handled by the Express middleware above.
+  return next();
 });
 
+app.get('*', (req, res) => res.sendFile(path.join(STATIC_DIR, 'index.html')));
+
 // Start Server
-server.listen(PORT, () => {
-  console.log(`\n=============================================================`);
-  console.log(`🚀 NeonCrates Full-Stack Server LIVE & RUNNING!`);
-  console.log(`-> Local URL:        http://localhost:${PORT}`);
-  console.log(`-> Real Database:    ${DB_FILE}`);
-  console.log(`-> Admin Protected:  2FA OTP Gate Active`);
-  console.log(`=============================================================\n`);
-});
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

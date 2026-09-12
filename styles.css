@@ -85,6 +85,8 @@
 
 html {
   scroll-behavior: smooth;
+  touch-action: manipulation;
+  overflow-x: hidden;
 }
 
 body {
@@ -92,6 +94,7 @@ body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   line-height: 1.5;
+  touch-action: manipulation;
   overflow-x: hidden;
   min-height: 100vh;
   transition: background-color var(--transition-normal), color var(--transition-normal);

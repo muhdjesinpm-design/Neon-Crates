@@ -970,6 +970,18 @@ footer {
 .promo-drone { background: linear-gradient(120deg, #075985, #06b6d4); }
 .promo-organic { background: linear-gradient(120deg, #166534, #84cc16); }
 
+.banner-slide {
+  background: linear-gradient(120deg, #075985, #06b6d4);
+}
+
+.banner-slide.promo-flash { background: linear-gradient(120deg, #ed1c24, #ff7a18); }
+.banner-slide.promo-drone { background: linear-gradient(120deg, #075985, #06b6d4); }
+.banner-slide.promo-organic { background: linear-gradient(120deg, #166534, #84cc16); }
+
+.banner-content {
+  min-width: 0;
+}
+
 .promo-swiper h2 {
   margin-bottom: 0.35rem;
   font-size: clamp(1.1rem, 2.5vw, 1.8rem);
@@ -981,7 +993,8 @@ footer {
   opacity: 0.92;
 }
 
-.promo-badge {
+.promo-badge,
+.banner-badge {
   flex: 0 0 auto;
   padding: 0.4rem 0.7rem;
   border: 1px solid rgba(255,255,255,.55);

@@ -11,6 +11,7 @@ if (userParam) {
 }
 
 const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
+let promoSwiper = null;
 
 /**
  * NeonCrates - Cyber-Fresh Online Grocery Supermarket Engine
@@ -1990,24 +1991,52 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
   /* ==========================================================================
      Application Initialization
      ========================================================================== */
-  function initializePromoSwiper() {
-    if (typeof Swiper === 'undefined' || !document.querySelector('.promo-swiper')) return;
+  async function fetchAndRenderBanners() {
+    const wrapper = document.querySelector('.promo-swiper .swiper-wrapper');
+    if (!wrapper) return;
 
-    new Swiper('.promo-swiper', {
-      loop: true,
-      autoplay: {
-        delay: 3500,
-        disableOnInteraction: false
-      },
-      pagination: {
-        el: '.promo-swiper .swiper-pagination',
-        clickable: true
-      },
-      navigation: {
-        nextEl: '.promo-swiper .swiper-button-next',
-        prevEl: '.promo-swiper .swiper-button-prev'
-      }
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/banners`);
+      if (!response.ok) throw new Error(`Banner request failed with status ${response.status}`);
+      const banners = await response.json();
+      const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      })[character]);
+
+      if (promoSwiper) promoSwiper.destroy(true, true);
+      wrapper.innerHTML = Array.isArray(banners) ? banners.map(banner => `
+        <div class="swiper-slide banner-slide ${escapeHtml(banner.type)}">
+          <div class="banner-content">
+            <span class="banner-badge">${escapeHtml(banner.badge)}</span>
+            <h2>${escapeHtml(banner.title)}</h2>
+            <p>${escapeHtml(banner.text)}</p>
+          </div>
+        </div>
+      `).join('') : '';
+
+      if (typeof Swiper === 'undefined') return;
+      promoSwiper = new Swiper('.promo-swiper', {
+        loop: Array.isArray(banners) && banners.length > 1,
+        autoplay: {
+          delay: 3500,
+          disableOnInteraction: false
+        },
+        pagination: {
+          el: '.promo-swiper .swiper-pagination',
+          clickable: true
+        },
+        navigation: {
+          nextEl: '.promo-swiper .swiper-button-next',
+          prevEl: '.promo-swiper .swiper-button-prev'
+        }
+      });
+    } catch (error) {
+      console.warn('Could not load promo banners:', error.message);
+    }
   }
 
   async function init() {
@@ -2019,7 +2048,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     updateCartDrawerUI();
     renderCrateBuilder();
     setupEventListeners();
-    initializePromoSwiper();
+    await fetchAndRenderBanners();
   }
 
   if (document.readyState === 'loading') {

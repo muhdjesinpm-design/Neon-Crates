@@ -18,7 +18,19 @@ const app = express();
 
 const DB_DIR = path.join(__dirname, 'data');
 const DB_FILE = path.join(DB_DIR, 'database.json');
-const DEFAULT_DB = { admin: {}, users: [], products: [], orders: [], promos: [], announcement: '' };
+const DEFAULT_DB = {
+  admin: {},
+  users: [],
+  products: [],
+  orders: [],
+  promos: [],
+  announcement: '',
+  banners: [
+    { id: 'b1', badge: 'FLASH SALE', title: '20% OFF ALL CRATES', text: 'Use promo code NEON20 at checkout', type: 'promo-flash' },
+    { id: 'b2', badge: '15-MIN EXPRESS', title: 'Autonomous Drone Delivery', text: 'Cold-chain temperature shielded shipping', type: 'promo-drone' },
+    { id: 'b3', badge: 'WEEKLY DROP', title: 'Fresh Organic Harvest', text: 'Direct from local regenerative farms', type: 'promo-organic' }
+  ]
+};
 const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
 const GOOGLE_CALLBACK_URL = 'https://neoncrates-backend.onrender.com/api/auth/google/callback';
@@ -216,14 +228,21 @@ function loadDB() {
 
     const raw = fs.readFileSync(DB_FILE, 'utf8');
     const storedDB = JSON.parse(raw);
-    return {
+    const normalizedDB = {
       ...DEFAULT_DB,
       ...storedDB,
       users: Array.isArray(storedDB.users) ? storedDB.users : [],
       products: Array.isArray(storedDB.products) ? storedDB.products : [],
       orders: Array.isArray(storedDB.orders) ? storedDB.orders : [],
-      promos: Array.isArray(storedDB.promos) ? storedDB.promos : []
+      promos: Array.isArray(storedDB.promos) ? storedDB.promos : [],
+      banners: Array.isArray(storedDB.banners) ? storedDB.banners : DEFAULT_DB.banners
     };
+
+    if (!Array.isArray(storedDB.banners)) {
+      fs.writeFileSync(DB_FILE, JSON.stringify(normalizedDB, null, 2), 'utf8');
+    }
+
+    return normalizedDB;
   } catch (err) {
     console.error('Error reading database file:', err);
     return JSON.parse(JSON.stringify(DEFAULT_DB));
@@ -250,7 +269,8 @@ function saveDB(data) {
       users: Array.isArray(data.users) ? data.users : (storedDB.users || []),
       products: Array.isArray(data.products) ? data.products : (storedDB.products || []),
       orders: Array.isArray(data.orders) ? data.orders : (storedDB.orders || []),
-      promos: Array.isArray(data.promos) ? data.promos : (storedDB.promos || [])
+      promos: Array.isArray(data.promos) ? data.promos : (storedDB.promos || []),
+      banners: Array.isArray(data.banners) ? data.banners : (storedDB.banners || [])
     };
 
     fs.writeFileSync(DB_FILE, JSON.stringify(mergedDB, null, 2), 'utf8');
@@ -542,6 +562,46 @@ app.post('/api/admin/promos', verifyAdmin, (req, res) => {
   db.promos.push(promo);
   saveDB(db);
   return res.status(201).json(promo);
+});
+
+app.get('/api/banners', (req, res) => {
+  const banners = loadDB().banners || [];
+  return res.json(banners.filter(banner => banner.active !== false));
+});
+
+app.post('/api/admin/banners', verifyAdmin, (req, res) => {
+  const { id, badge, title, text, type } = req.body || {};
+  if (!badge || !title || !text || !type) {
+    return res.status(400).json({ error: 'Badge, title, text, and type are required.' });
+  }
+
+  const db = loadDB();
+  const banner = {
+    id: String(id || `b-${Date.now()}`).trim(),
+    badge: String(badge).trim(),
+    title: String(title).trim(),
+    text: String(text).trim(),
+    type: String(type).trim(),
+    active: true
+  };
+
+  if (db.banners.some(existing => existing.id === banner.id)) {
+    return res.status(409).json({ error: 'A banner with this ID already exists.' });
+  }
+
+  db.banners.push(banner);
+  if (!saveDB(db)) return res.status(500).json({ error: 'Could not save the banner.' });
+  return res.status(201).json(banner);
+});
+
+app.delete('/api/admin/banners/:id', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  const index = db.banners.findIndex(banner => banner.id === req.params.id);
+  if (index < 0) return res.status(404).json({ error: 'Banner not found.' });
+
+  const [banner] = db.banners.splice(index, 1);
+  if (!saveDB(db)) return res.status(500).json({ error: 'Could not save banner changes.' });
+  return res.json({ success: true, banner });
 });
 
 app.post('/api/admin/announcement', verifyAdmin, (req, res) => {

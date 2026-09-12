@@ -14,10 +14,6 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
 const DB_FILE = path.join(__dirname, 'data', 'database.json');
 const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
@@ -29,9 +25,7 @@ const activeOtps = new Map();
 const securityLog = [];
 
 // Express handles the beginner-friendly standalone login and signup pages.
-const authApp = express();
-authApp.use(express.json());
-
+app.use(express.json());
 function publicUser(user) {
   return {
     id: user.id,
@@ -762,4 +756,8 @@ server.listen(PORT, () => {
   console.log(`-> Real Database:    ${DB_FILE}`);
   console.log(`-> Admin Protected:  2FA OTP Gate Active`);
   console.log(`=============================================================\n`);
+});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

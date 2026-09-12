@@ -43,7 +43,7 @@ app.post('/signup', async (req, res) => {
     const { name, phone = '', address = '', email, password } = req.body || {};
     const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
 
-    if (!name || !normalizedEmail || !password) {
+    if (!name || !normalizedEmail || typeof password !== 'string' || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required.' });
     }
     if (password.length < 8) {
@@ -51,7 +51,7 @@ app.post('/signup', async (req, res) => {
     }
 
     const db = loadDB();
-    if (db.users.some(user => user.email.toLowerCase() === normalizedEmail)) {
+    if (db.users.some(user => typeof user.email === 'string' && user.email.toLowerCase() === normalizedEmail)) {
       return res.status(409).json({ error: 'An account with this email address already exists.' });
     }
 
@@ -82,11 +82,15 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
-    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
     const db = loadDB();
     const user = db.users.find(candidate => candidate.email.toLowerCase() === normalizedEmail);
 
-    if (!user || !password) {
+    if (!user || typeof user.passwordHash !== 'string') {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
@@ -154,7 +158,11 @@ function saveDB(data) {
    Cryptographic Helpers (PBKDF2 Password Hashing & HMAC Tokens)
    ========================================================================== */
 function hashPassword(password, salt) {
-  return crypto.pbkdf2Sync(password, salt, 1000, 32, 'sha256').toString('hex');
+  const safePassword = typeof password === 'string' ? password : '';
+  const safeSalt = typeof salt === 'string' && salt.length > 0
+    ? salt
+    : crypto.randomBytes(16).toString('hex');
+  return crypto.pbkdf2Sync(safePassword, safeSalt, 1000, 32, 'sha256').toString('hex');
 }
 
 function createSalt() {
@@ -329,12 +337,14 @@ app.use(async (req, res, next) => {
         const body = req.body || {};
         const { name, phone, email, address, password } = body;
 
-        if (!name || !phone || !email || !address || !password) {
+        if (typeof name !== 'string' || typeof phone !== 'string' || typeof email !== 'string' ||
+            typeof address !== 'string' || typeof password !== 'string' ||
+            !name.trim() || !phone.trim() || !email.trim() || !address.trim() || !password) {
           return sendError(res, 400, 'All fields (name, phone, email, address, password) are required.');
         }
 
         const db = loadDB();
-        const existing = db.users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
+        const existing = db.users.find(u => typeof u.email === 'string' && u.email.toLowerCase() === email.toLowerCase().trim());
         if (existing) {
           return sendError(res, 409, 'An account with this email address already exists.');
         }
@@ -380,13 +390,13 @@ app.use(async (req, res, next) => {
         const body = req.body || {};
         const { email, password } = body;
 
-        if (!email || !password) {
+        if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
           return sendError(res, 400, 'Email and password are required.');
         }
 
         const db = loadDB();
         const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
-        if (!user) {
+        if (!user || typeof user.passwordHash !== 'string') {
           return sendError(res, 401, 'Invalid email or password.');
         }
 

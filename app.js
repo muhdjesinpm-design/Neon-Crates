@@ -799,7 +799,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     const password = DOM.signInPassword.value.trim();
 
     try {
-      const result = await apiRequest('/api/auth/login', {
+      const result = await apiRequest('/login', {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
@@ -829,7 +829,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     }
 
     try {
-      const result = await apiRequest('/api/auth/register', {
+      const result = await apiRequest('/signup', {
         method: 'POST',
         body: JSON.stringify({ name, phone, email, address, password })
       });

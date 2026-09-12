@@ -2843,5 +2843,15 @@ footer {
     white-space: normal !important;
   }
 }
+/* Keep product grid directly under promo banner */
+.promo-banner-section {
+  margin-bottom: 15px !important;
+}
+
+.products-section, 
+#products {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
 
 

@@ -2702,5 +2702,31 @@ footer {
   color: white;
   box-shadow: 0 0 12px rgba(255, 51, 102, 0.4);
 }
+/* Mobile Fix for Packed Crate Grid */
+@media (max-width: 768px) {
+  .crate-builder-section,
+  .packed-crate-container,
+  .crate-slots-grid,
+  [class*="slot"] {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force 2 equal columns that stay strictly inside screen bounds */
+  .crate-slots-grid,
+  div[class*="slots"] {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  /* Prevent selected item title from expanding the slot width */
+  div[class*="slot"] * {
+    max-width: 100% !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+}
 
 

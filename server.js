@@ -10,6 +10,9 @@ const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 
@@ -18,13 +21,87 @@ const DB_FILE = path.join(DB_DIR, 'database.json');
 const DEFAULT_DB = { admin: {}, users: [], products: [], orders: [] };
 const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
+const GOOGLE_CALLBACK_URL = 'https://neoncrates-backend.onrender.com/api/auth/google/callback';
+const FRONTEND_URL = 'https://muhdjesinpm-design.github.io/Neon-Crates/';
 
 // Latest security events log (in-memory circular log for audit)
 const securityLog = [];
 
 // Express handles the beginner-friendly standalone login and signup pages.
 app.use(cors());
+app.use(session({
+  secret: process.env.SESSION_SECRET || SECRET_KEY,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax'
+  }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.json({ limit: '10mb' }));
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser((id, done) => {
+  const user = loadDB().users.find(candidate => candidate.id === id);
+  done(null, user || false);
+});
+
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: GOOGLE_CALLBACK_URL
+  }, (accessToken, refreshToken, profile, done) => {
+    try {
+      const db = loadDB();
+      const email = profile.emails?.[0]?.value?.trim().toLowerCase() || '';
+      let user = db.users.find(candidate =>
+        candidate.googleId === profile.id || (email && candidate.email === email)
+      );
+
+      if (!user) {
+        user = {
+          id: `usr-${Date.now()}`,
+          name: profile.displayName || 'NeonCrates Customer',
+          phone: '',
+          email,
+          address: '',
+          passwordHash: '',
+          googleId: profile.id,
+          createdAt: new Date().toISOString()
+        };
+        db.users.push(user);
+      } else if (!user.googleId) {
+        user.googleId = profile.id;
+      }
+
+      if (!saveDB(db)) return done(new Error('Could not save the Google account.'));
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  }));
+}
+
+app.get('/api/auth/google', (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.status(503).json({ error: 'Google authentication is not configured.' });
+  }
+  return passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
+
+app.get(
+  '/api/auth/google/callback',
+  (req, res, next) => passport.authenticate('google', {
+    failureRedirect: `${FRONTEND_URL}login.html?error=google_auth_failed`
+  })(req, res, next),
+  (req, res) => {
+    res.redirect(FRONTEND_URL);
+  }
+);
 function publicUser(user) {
   return {
     id: user.id,

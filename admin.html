@@ -3,43 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NeonCrates Admin Portal</title>
+  <title>NeonCrates Admin Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
     :root { --admin-panel: #101b2d; --admin-line: rgba(255,255,255,.1); }
     body { min-height: 100vh; background: var(--bg-main); }
-    .admin-page { width: 100%; max-width: 1240px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-    .admin-page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
-    .admin-page-header h1 { color: var(--neon-cyan); }
-    .admin-page-header p { color: var(--text-secondary); margin-top: .35rem; }
-    .admin-tabs { display: flex; gap: .75rem; border-bottom: 1px solid var(--admin-line); margin-bottom: 1.5rem; }
-    .admin-tab { color: var(--text-secondary); padding: .8rem 1rem; border-bottom: 2px solid transparent; }
+    .admin-page { width: 100%; max-width: 1360px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .admin-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.75rem; }
+    .admin-header h1 { color: var(--neon-cyan); }
+    .admin-header p, .admin-muted { color: var(--text-secondary); }
+    .admin-tabs { display: flex; gap: .5rem; overflow-x: auto; border-bottom: 1px solid var(--admin-line); margin-bottom: 1.25rem; }
+    .admin-tab { flex: 0 0 auto; padding: .8rem 1rem; color: var(--text-secondary); border-bottom: 2px solid transparent; white-space: nowrap; }
     .admin-tab.active { color: var(--neon-green); border-bottom-color: var(--neon-green); }
     .admin-panel { background: var(--admin-panel); border: 1px solid var(--admin-line); border-radius: var(--radius-md); padding: 1.25rem; }
-    .admin-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 1.5rem; }
-    .admin-form input { width: 100%; min-width: 0; padding: .75rem; border: 1px solid var(--admin-line); border-radius: var(--radius-sm); color: var(--text-primary); background: var(--bg-card); }
-    .admin-form button { min-height: 2.8rem; padding: 0 .9rem; border-radius: var(--radius-sm); color: #07130f; background: var(--neon-green); font-weight: 700; }
-    .admin-list { display: grid; gap: .75rem; }
-    .admin-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem; border: 1px solid var(--admin-line); border-radius: var(--radius-sm); background: rgba(255,255,255,.025); }
-    .admin-row strong { display: block; }
-    .admin-row small { color: var(--text-secondary); }
+    .admin-panel h2 { margin-bottom: 1rem; }
+    .admin-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+    .admin-kpi { padding: 1.1rem; border: 1px solid var(--admin-line); border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(0,255,135,.08), rgba(96,239,255,.05)); }
+    .admin-kpi-label { color: var(--text-secondary); font-size: .8rem; }
+    .admin-kpi-value { margin-top: .35rem; color: var(--neon-green); font: 800 1.65rem var(--font-heading); }
+    .admin-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 1rem; }
+    .admin-form input, .admin-form select, .admin-form textarea { width: 100%; min-width: 0; padding: .72rem; border: 1px solid var(--admin-line); border-radius: var(--radius-sm); color: var(--text-primary); background: var(--bg-card); font: inherit; }
+    .admin-form textarea { min-height: 100px; resize: vertical; }
+    .admin-form .wide { grid-column: 1 / -1; }
+    .admin-button { min-height: 2.7rem; padding: .65rem .9rem; border-radius: var(--radius-sm); color: #07130f; background: var(--neon-green); font-weight: 700; }
+    .admin-button.secondary { color: var(--text-primary); background: transparent; border: 1px solid var(--admin-line); }
+    .admin-button.danger { color: var(--neon-coral); background: transparent; border: 1px solid var(--neon-coral); }
     .admin-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
-    .admin-actions button { padding: .5rem .7rem; border: 1px solid var(--admin-line); border-radius: var(--radius-sm); color: var(--text-primary); background: transparent; }
-    .admin-actions .danger { color: var(--neon-coral); }
-    .admin-empty, #adminMessage { color: var(--text-secondary); }
+    .admin-table-wrap { overflow-x: auto; border: 1px solid var(--admin-line); border-radius: var(--radius-sm); }
+    .admin-table { width: 100%; min-width: 720px; border-collapse: collapse; text-align: left; }
+    .admin-table th, .admin-table td { padding: .75rem; border-bottom: 1px solid var(--admin-line); vertical-align: middle; }
+    .admin-table th { color: var(--text-secondary); font-size: .75rem; text-transform: uppercase; }
+    .admin-table td { font-size: .86rem; }
+    .admin-table select { padding: .45rem; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--admin-line); border-radius: 5px; }
+    .admin-message { min-height: 1.4rem; margin: .75rem 0; color: var(--text-secondary); }
+    .admin-empty { color: var(--text-secondary); padding: 1rem; }
     @media (max-width: 768px) {
       .admin-page { padding: 1.25rem 15px 3rem; }
-      .admin-page-header, .admin-row { align-items: flex-start; flex-direction: column; }
+      .admin-header { flex-direction: column; }
+      .admin-kpis { grid-template-columns: repeat(2, 1fr); }
       .admin-form { grid-template-columns: 1fr; }
-      .admin-actions, .admin-actions button { width: 100%; }
+      .admin-form .wide { grid-column: auto; }
     }
   </style>
   <script>
     try {
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-      if (!currentUser || currentUser.role !== 'admin') {
-        window.location.href = 'index.html';
-      }
+      if (!currentUser || currentUser.role !== 'admin') window.location.href = 'index.html';
     } catch (error) {
       window.location.href = 'index.html';
     }
@@ -47,143 +56,114 @@
 </head>
 <body>
   <main class="admin-page">
-    <header class="admin-page-header">
-      <div>
-        <h1>Control Center</h1>
-        <p>Manage the NeonCrates catalog and customer orders.</p>
-      </div>
+    <header class="admin-header">
+      <div><h1>NeonCrates Control Center</h1><p>Catalog, orders, customers, promotions, and live announcements.</p></div>
       <a class="btn-secondary" href="index.html">Back to store</a>
     </header>
 
+    <section class="admin-kpis" aria-label="Store metrics">
+      <article class="admin-kpi"><div class="admin-kpi-label">Total Revenue</div><div class="admin-kpi-value" id="metricRevenue">$0.00</div></article>
+      <article class="admin-kpi"><div class="admin-kpi-label">Active Orders</div><div class="admin-kpi-value" id="metricOrders">0</div></article>
+      <article class="admin-kpi"><div class="admin-kpi-label">Total Customers</div><div class="admin-kpi-value" id="metricCustomers">0</div></article>
+      <article class="admin-kpi"><div class="admin-kpi-label">Average Order Value</div><div class="admin-kpi-value" id="metricAov">$0.00</div></article>
+    </section>
+
     <nav class="admin-tabs" aria-label="Admin sections">
-      <button class="admin-tab active" type="button" data-tab="products">Manage Products</button>
-      <button class="admin-tab" type="button" data-tab="orders">View Orders</button>
+      <button class="admin-tab active" type="button" data-tab="products">Products</button>
+      <button class="admin-tab" type="button" data-tab="orders">Orders</button>
+      <button class="admin-tab" type="button" data-tab="users">Users</button>
+      <button class="admin-tab" type="button" data-tab="promos">Promos</button>
+      <button class="admin-tab" type="button" data-tab="alerts">Site Alerts</button>
     </nav>
 
-    <section class="admin-panel" id="productsPanel">
+    <section class="admin-panel" data-panel="products">
       <h2>Manage Products</h2>
       <form class="admin-form" id="productForm">
         <input id="productId" type="hidden" />
         <input id="productTitle" placeholder="Product title" required />
-        <input id="productCategory" placeholder="Category" required />
+        <input id="productCategory" placeholder="Aisle category" required />
         <input id="productPrice" type="number" min="0" step="0.01" placeholder="Price" required />
-        <input id="productUnit" placeholder="Unit (optional)" />
-        <input id="productImage" type="url" placeholder="Image URL (optional)" />
-        <button type="submit">Save product</button>
+        <input id="productStock" type="number" min="0" step="1" placeholder="Stock" required />
+        <input id="productImage" type="url" placeholder="Image URL" />
+        <button class="admin-button" type="submit">Save product</button>
       </form>
-      <p id="adminMessage" role="status" aria-live="polite"></p>
-      <div class="admin-list" id="productsList"></div>
+      <div class="admin-message" id="productMessage" role="status"></div>
+      <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Product</th><th>Aisle</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="productsTable"></tbody></table></div>
     </section>
 
-    <section class="admin-panel" id="ordersPanel" hidden>
-      <h2>View Orders</h2>
-      <div class="admin-list" id="ordersList"></div>
+    <section class="admin-panel" data-panel="orders" hidden>
+      <h2>Orders</h2>
+      <div class="admin-form"><input id="orderFilter" placeholder="Filter by order, name, or status" /><select id="orderStatusFilter"><option value="">All statuses</option><option>Pending</option><option>Packing</option><option>Drone Out</option><option>Delivered</option></select></div>
+      <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Date</th><th>Status</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+    </section>
+
+    <section class="admin-panel" data-panel="users" hidden>
+      <h2>Users</h2>
+      <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Access</th><th>Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div>
+    </section>
+
+    <section class="admin-panel" data-panel="promos" hidden>
+      <h2>Discount Manager</h2>
+      <form class="admin-form" id="promoForm"><input id="promoCode" placeholder="Promo code" required /><input id="promoDiscount" type="number" min="1" max="100" placeholder="Discount %" required /><input id="promoMaxUses" type="number" min="0" placeholder="Max uses (0 = unlimited)" /><button class="admin-button" type="submit">Create promo</button></form>
+      <div class="admin-message" id="promoMessage" role="status"></div>
+      <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Code</th><th>Discount</th><th>Max uses</th><th>Used</th><th>Status</th></tr></thead><tbody id="promosTable"></tbody></table></div>
+    </section>
+
+    <section class="admin-panel" data-panel="alerts" hidden>
+      <h2>Site Alerts</h2>
+      <form class="admin-form" id="announcementForm"><textarea class="wide" id="announcementText" placeholder="Announcement shown across the main site"></textarea><button class="admin-button" type="submit">Publish announcement</button></form>
+      <div class="admin-message" id="announcementMessage" role="status"></div>
     </section>
   </main>
 
   <script>
     const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
-    const adminHeaders = { 'Content-Type': 'application/json', 'x-user-role': 'admin' };
-    const productsList = document.getElementById('productsList');
-    const ordersList = document.getElementById('ordersList');
-    const productForm = document.getElementById('productForm');
-    const adminMessage = document.getElementById('adminMessage');
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const headers = { 'Content-Type': 'application/json', 'x-user-role': 'admin', 'x-user-email': user.email };
+    const state = { products: [], orders: [], users: [], promos: [] };
+    const money = value => `$${Number(value || 0).toFixed(2)}`;
+    const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 
-    async function request(path, options = {}) {
-      const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers: { ...adminHeaders, ...(options.headers || {}) } });
+    async function api(path, options = {}) {
+      const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers: { ...headers, ...(options.headers || {}) } });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Request failed');
       return payload;
     }
 
-    function resetProductForm() {
-      productForm.reset();
-      document.getElementById('productId').value = '';
-    }
+    function showMessage(id, message) { document.getElementById(id).textContent = message; }
+    function productPayload() { return { title: productTitle.value.trim(), category: productCategory.value.trim(), price: productPrice.value, stock: productStock.value, image: productImage.value.trim() }; }
 
-    function fillProductForm(product) {
-      document.getElementById('productId').value = product.id;
-      document.getElementById('productTitle').value = product.title || '';
-      document.getElementById('productCategory').value = product.category || '';
-      document.getElementById('productPrice').value = product.price || '';
-      document.getElementById('productUnit').value = product.unit || '';
-      document.getElementById('productImage').value = product.image || '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    async function loadMetrics() {
+      const metrics = await api('/api/admin/metrics');
+      metricRevenue.textContent = money(metrics.totalRevenue); metricOrders.textContent = metrics.activeOrders; metricCustomers.textContent = metrics.totalCustomers; metricAov.textContent = money(metrics.averageOrderValue);
     }
-
     async function loadProducts() {
-      const products = await request('/api/products');
-      productsList.innerHTML = products.length ? products.map(product => `
-        <article class="admin-row">
-          <div><strong>${product.title}</strong><small>${product.category} | $${Number(product.price).toFixed(2)}</small></div>
-          <div class="admin-actions">
-            <button type="button" data-edit="${product.id}">Edit</button>
-            <button class="danger" type="button" data-delete="${product.id}">Delete</button>
-          </div>
-        </article>`).join('') : '<p class="admin-empty">No products found.</p>';
+      state.products = await api('/api/admin/products');
+      productsTable.innerHTML = state.products.length ? state.products.map(item => `<tr><td>${escapeHtml(item.title)}</td><td>${escapeHtml(item.category)}</td><td>${money(item.price)}</td><td>${item.stock ?? 0}</td><td><div class="admin-actions"><button class="admin-button secondary" data-edit="${item.id}" type="button">Edit</button><button class="admin-button danger" data-delete="${item.id}" type="button">Delete</button></div></td></tr>`).join('') : '<tr><td colspan="5" class="admin-empty">No products found.</td></tr>';
     }
-
-    async function loadOrders() {
-      const orders = await request('/api/admin/orders');
-      ordersList.innerHTML = orders.length ? orders.map(order => `
-        <article class="admin-row">
-          <div><strong>${order.orderId} | ${order.name}</strong><small>${order.address} | $${Number(order.total).toFixed(2)}</small></div>
-          <div class="admin-actions"><button type="button" data-order="${order.orderId}" data-status="Delivered">Mark delivered</button></div>
-        </article>`).join('') : '<p class="admin-empty">No orders found.</p>';
+    function renderOrders() {
+      const term = orderFilter.value.trim().toLowerCase(); const status = orderStatusFilter.value;
+      const orders = state.orders.filter(order => (!status || order.status === status) && (!term || `${order.orderId} ${order.name} ${order.status}`.toLowerCase().includes(term)));
+      ordersTable.innerHTML = orders.length ? orders.map(order => `<tr><td>${escapeHtml(order.orderId)}</td><td>${escapeHtml(order.name)}</td><td>${money(order.total)}</td><td>${new Date(order.date).toLocaleDateString()}</td><td><select data-order-status="${escapeHtml(order.orderId)}"><option ${order.status === 'Pending' ? 'selected' : ''}>Pending</option><option ${order.status === 'Packing' ? 'selected' : ''}>Packing</option><option ${order.status === 'Drone Out' ? 'selected' : ''}>Drone Out</option><option ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option></select></td></tr>`).join('') : '<tr><td colspan="5" class="admin-empty">No matching orders.</td></tr>';
     }
+    async function loadOrders() { state.orders = await api('/api/admin/orders'); renderOrders(); }
+    async function loadUsers() {
+      state.users = await api('/api/admin/users');
+      usersTable.innerHTML = state.users.length ? state.users.map(item => `<tr><td>${escapeHtml(item.id)}</td><td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.email)}</td><td><select data-user-role="${item.id}"><option ${item.role === 'user' ? 'selected' : ''}>user</option><option ${item.role === 'admin' ? 'selected' : ''}>admin</option></select></td><td>${item.suspended ? 'Suspended' : 'Active'}</td><td><button class="admin-button ${item.suspended ? 'secondary' : 'danger'}" type="button" data-suspend="${item.id}">${item.suspended ? 'Restore' : 'Suspend'}</button></td></tr>`).join('') : '<tr><td colspan="6" class="admin-empty">No users found.</td></tr>';
+    }
+    async function loadPromos() { state.promos = await api('/api/admin/promos'); promosTable.innerHTML = state.promos.length ? state.promos.map(item => `<tr><td>${escapeHtml(item.code)}</td><td>${item.discountPercent}%</td><td>${item.maxUses || 'Unlimited'}</td><td>${item.uses || 0}</td><td>${item.active ? 'Active' : 'Inactive'}</td></tr>`).join('') : '<tr><td colspan="5" class="admin-empty">No promos found.</td></tr>'; }
 
-    productForm.addEventListener('submit', async event => {
-      event.preventDefault();
-      const id = document.getElementById('productId').value;
-      const body = {
-        title: document.getElementById('productTitle').value.trim(),
-        category: document.getElementById('productCategory').value.trim(),
-        price: document.getElementById('productPrice').value,
-        unit: document.getElementById('productUnit').value.trim(),
-        image: document.getElementById('productImage').value.trim()
-      };
-      try {
-        await request(id ? `/api/products/${encodeURIComponent(id)}` : '/api/products', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
-        adminMessage.textContent = 'Product saved.';
-        resetProductForm();
-        await loadProducts();
-      } catch (error) { adminMessage.textContent = error.message; }
-    });
-
-    productsList.addEventListener('click', async event => {
-      const editId = event.target.dataset.edit;
-      const deleteId = event.target.dataset.delete;
-      try {
-        if (editId) {
-          const products = await request('/api/products');
-          const product = products.find(item => item.id === editId);
-          if (product) fillProductForm(product);
-        }
-        if (deleteId) {
-          await request(`/api/products/${encodeURIComponent(deleteId)}`, { method: 'DELETE' });
-          await loadProducts();
-        }
-      } catch (error) { adminMessage.textContent = error.message; }
-    });
-
-    ordersList.addEventListener('click', async event => {
-      const orderId = event.target.dataset.order;
-      if (!orderId) return;
-      try {
-        await request(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, { method: 'PATCH', body: JSON.stringify({ status: event.target.dataset.status }) });
-        await loadOrders();
-      } catch (error) { ordersList.insertAdjacentHTML('afterbegin', `<p class="admin-empty">${error.message}</p>`); }
-    });
-
-    document.querySelectorAll('[data-tab]').forEach(tab => tab.addEventListener('click', async () => {
-      document.querySelectorAll('[data-tab]').forEach(item => item.classList.toggle('active', item === tab));
-      const showOrders = tab.dataset.tab === 'orders';
-      document.getElementById('productsPanel').hidden = showOrders;
-      document.getElementById('ordersPanel').hidden = !showOrders;
-      if (showOrders) await loadOrders();
-    }));
-
-    loadProducts().catch(error => { adminMessage.textContent = error.message; });
+    productForm.addEventListener('submit', async event => { event.preventDefault(); const id = productId.value; try { await api(id ? `/api/admin/products/${encodeURIComponent(id)}` : '/api/admin/products', { method: id ? 'PUT' : 'POST', body: JSON.stringify(productPayload()) }); showMessage('productMessage', 'Product saved.'); productForm.reset(); productId.value = ''; await loadProducts(); } catch (error) { showMessage('productMessage', error.message); } });
+    productsTable.addEventListener('click', async event => { const edit = event.target.dataset.edit; const remove = event.target.dataset.delete; try { if (edit) { const item = state.products.find(product => product.id === edit); if (item) { productId.value = item.id; productTitle.value = item.title; productCategory.value = item.category; productPrice.value = item.price; productStock.value = item.stock || 0; productImage.value = item.image || ''; window.scrollTo({ top: 0, behavior: 'smooth' }); } } if (remove) { await api(`/api/admin/products/${encodeURIComponent(remove)}`, { method: 'DELETE' }); await loadProducts(); } } catch (error) { showMessage('productMessage', error.message); } });
+    orderFilter.addEventListener('input', renderOrders); orderStatusFilter.addEventListener('change', renderOrders);
+    ordersTable.addEventListener('change', async event => { const id = event.target.dataset.orderStatus; if (!id) return; try { await api(`/api/admin/orders/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify({ status: event.target.value }) }); await Promise.all([loadOrders(), loadMetrics()]); } catch (error) { alert(error.message); } });
+    usersTable.addEventListener('change', async event => { const id = event.target.dataset.userRole; if (!id) return; await api(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify({ role: event.target.value }) }); });
+    usersTable.addEventListener('click', async event => { const id = event.target.dataset.suspend; if (!id) return; const item = state.users.find(userItem => userItem.id === id); await api(`/api/admin/users/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify({ suspended: !item.suspended }) }); await loadUsers(); });
+    promoForm.addEventListener('submit', async event => { event.preventDefault(); try { await api('/api/admin/promos', { method: 'POST', body: JSON.stringify({ code: promoCode.value, discountPercent: promoDiscount.value, maxUses: promoMaxUses.value }) }); showMessage('promoMessage', 'Promo created.'); promoForm.reset(); await loadPromos(); } catch (error) { showMessage('promoMessage', error.message); } });
+    announcementForm.addEventListener('submit', async event => { event.preventDefault(); try { await api('/api/admin/announcement', { method: 'POST', body: JSON.stringify({ text: announcementText.value }) }); showMessage('announcementMessage', 'Announcement published.'); } catch (error) { showMessage('announcementMessage', error.message); } });
+    document.querySelectorAll('[data-tab]').forEach(tab => tab.addEventListener('click', async () => { document.querySelectorAll('[data-tab]').forEach(item => item.classList.toggle('active', item === tab)); document.querySelectorAll('[data-panel]').forEach(panel => { panel.hidden = panel.dataset.panel !== tab.dataset.tab; }); if (tab.dataset.tab === 'orders') await loadOrders(); if (tab.dataset.tab === 'users') await loadUsers(); if (tab.dataset.tab === 'promos') await loadPromos(); }));
+    Promise.all([loadMetrics(), loadProducts()]).catch(error => showMessage('productMessage', error.message));
   </script>
 </body>
 </html>

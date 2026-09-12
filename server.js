@@ -18,7 +18,7 @@ const app = express();
 
 const DB_DIR = path.join(__dirname, 'data');
 const DB_FILE = path.join(DB_DIR, 'database.json');
-const DEFAULT_DB = { admin: {}, users: [], products: [], orders: [] };
+const DEFAULT_DB = { admin: {}, users: [], products: [], orders: [], promos: [], announcement: '' };
 const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
 const GOOGLE_CALLBACK_URL = 'https://neoncrates-backend.onrender.com/api/auth/google/callback';
@@ -334,7 +334,8 @@ function getAdminFromReq(req) {
 
 function verifyAdmin(req, res, next) {
   const userRole = req.headers['x-user-role'];
-  if (userRole === 'admin') {
+  const userEmail = String(req.headers['x-user-email'] || '').trim().toLowerCase();
+  if (userRole === 'admin' || ADMIN_EMAILS.includes(userEmail)) {
     req.adminAuthorized = true;
     next();
   } else {
@@ -397,7 +398,8 @@ function serveStaticFile(req, res, pathname) {
 app.use(express.static(STATIC_DIR));
 
 app.use('/api', (req, res, next) => {
-  const isProductManagement = req.path === '/products' && ['POST', 'PUT'].includes(req.method)
+  const isAdminApi = req.path.startsWith('/admin/');
+  const isProductManagement = isAdminApi || req.path === '/products' && ['POST', 'PUT'].includes(req.method)
     || req.path.startsWith('/products/') && req.method === 'DELETE';
   const isOrderManagement = req.path === '/admin/orders' && req.method === 'GET'
     || req.path.startsWith('/admin/orders/') && ['PATCH', 'PUT'].includes(req.method)
@@ -409,8 +411,124 @@ app.use('/api', (req, res, next) => {
   return next();
 });
 
+app.get('/api/admin/metrics', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  const revenue = db.orders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
+  const activeStatuses = new Set(['Pending', 'Packing', 'Drone Out']);
+  const activeOrders = db.orders.filter(order => activeStatuses.has(order.status)).length;
+  return res.json({
+    totalRevenue: revenue,
+    activeOrders,
+    totalCustomers: db.users.length,
+    averageOrderValue: db.orders.length ? revenue / db.orders.length : 0,
+    totalOrders: db.orders.length
+  });
+});
+
+app.get('/api/admin/products', verifyAdmin, (req, res) => res.json(loadDB().products || []));
+
+app.post('/api/admin/products', verifyAdmin, (req, res) => {
+  const body = req.body || {};
+  if (!body.title || !body.category || body.price === undefined) {
+    return res.status(400).json({ error: 'Title, category, and price are required.' });
+  }
+  const db = loadDB();
+  const product = {
+    id: `prod-${Date.now()}`,
+    title: String(body.title).trim(),
+    category: String(body.category).trim().toLowerCase(),
+    price: Number(body.price) || 0,
+    stock: Number(body.stock) || 0,
+    unit: String(body.unit || '1 Pack').trim(),
+    image: body.image || '',
+    description: String(body.description || '').trim(),
+    badges: body.badges || [],
+    dietary: body.dietary || []
+  };
+  db.products.push(product);
+  saveDB(db);
+  return res.status(201).json(product);
+});
+
+app.put('/api/admin/products/:id', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  const product = db.products.find(item => item.id === req.params.id);
+  if (!product) return res.status(404).json({ error: 'Product not found.' });
+  const body = req.body || {};
+  if (body.title !== undefined) product.title = String(body.title).trim();
+  if (body.category !== undefined) product.category = String(body.category).trim().toLowerCase();
+  if (body.price !== undefined) product.price = Number(body.price) || 0;
+  if (body.stock !== undefined) product.stock = Number(body.stock) || 0;
+  if (body.image !== undefined) product.image = body.image;
+  if (body.unit !== undefined) product.unit = String(body.unit).trim();
+  saveDB(db);
+  return res.json(product);
+});
+
+app.delete('/api/admin/products/:id', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  const index = db.products.findIndex(item => item.id === req.params.id);
+  if (index < 0) return res.status(404).json({ error: 'Product not found.' });
+  const [product] = db.products.splice(index, 1);
+  saveDB(db);
+  return res.json({ success: true, product });
+});
+
+app.get('/api/admin/orders', verifyAdmin, (req, res) => res.json(loadDB().orders || []));
+
+app.put('/api/admin/orders/:id', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  const order = db.orders.find(item => item.orderId === req.params.id || item.id === req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found.' });
+  if (req.body?.status) order.status = req.body.status;
+  saveDB(db);
+  return res.json(order);
+});
+
+app.get('/api/admin/users', verifyAdmin, (req, res) => res.json((loadDB().users || []).map(user => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role || 'user',
+  suspended: Boolean(user.suspended)
+}))));
+
+app.put('/api/admin/users/:id', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  const user = db.users.find(item => item.id === req.params.id);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+  if (req.body?.role === 'admin' || req.body?.role === 'user') user.role = req.body.role;
+  if (typeof req.body?.suspended === 'boolean') user.suspended = req.body.suspended;
+  saveDB(db);
+  return res.json({ id: user.id, name: user.name, email: user.email, role: user.role || 'user', suspended: Boolean(user.suspended) });
+});
+
+app.get('/api/admin/promos', verifyAdmin, (req, res) => res.json(loadDB().promos || []));
+
+app.post('/api/admin/promos', verifyAdmin, (req, res) => {
+  const { code, discountPercent, maxUses } = req.body || {};
+  if (!code || Number(discountPercent) <= 0) return res.status(400).json({ error: 'Code and discount percent are required.' });
+  const db = loadDB();
+  const promo = { code: String(code).trim().toUpperCase(), discountPercent: Number(discountPercent), maxUses: Number(maxUses) || 0, uses: 0, active: true };
+  db.promos = db.promos || [];
+  db.promos.push(promo);
+  saveDB(db);
+  return res.status(201).json(promo);
+});
+
+app.post('/api/admin/announcement', verifyAdmin, (req, res) => {
+  const db = loadDB();
+  db.announcement = String(req.body?.text || '').trim();
+  saveDB(db);
+  return res.json({ announcement: db.announcement });
+});
+
 app.get('/api/health', (req, res) => {
   return sendJSON(res, 200, { status: 'healthy', time: new Date().toISOString() });
+});
+
+app.get('/api/announcement', (req, res) => {
+  return res.json({ announcement: loadDB().announcement || '' });
 });
 
 app.use(async (req, res, next) => {

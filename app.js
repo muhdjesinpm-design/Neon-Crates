@@ -706,6 +706,20 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     }
   }
 
+  async function loadAnnouncement() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/announcement`);
+      const payload = await response.json();
+      const banner = document.getElementById('siteAnnouncement');
+      if (banner && payload.announcement) {
+        banner.textContent = payload.announcement;
+        banner.hidden = false;
+      }
+    } catch (error) {
+      console.warn('Could not load site announcement:', error.message);
+    }
+  }
+
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -1980,6 +1994,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     applyTheme(STATE.theme);
     updateUserHeaderUI();
     await loadServerProducts();
+    await loadAnnouncement();
     renderProducts();
     updateCartDrawerUI();
     renderCrateBuilder();

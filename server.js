@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
+const cors = require('cors');
 const bcrypt = require('bcryptjs');
 
 const app = express();
@@ -23,6 +24,7 @@ const activeOtps = new Map();
 const securityLog = [];
 
 // Express handles the beginner-friendly standalone login and signup pages.
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 function publicUser(user) {
   return {

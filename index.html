@@ -938,6 +938,14 @@
     });
   </script>
 
+  <script>
+    const productSection = document.getElementById('store-aisles');
+    const heroSection = document.querySelector('.hero-section');
+    if (productSection && heroSection) {
+      heroSection.parentNode.insertBefore(productSection, heroSection);
+    }
+  </script>
+
   <!-- Application Script -->
   <script src="app.js"></script>
 </body>

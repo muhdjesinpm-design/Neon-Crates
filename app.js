@@ -555,8 +555,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     userOrdersListBody: document.getElementById('userOrdersListBody'),
 
     // Admin Portal
-    adminModal: document.getElementById('adminModal'),
-    adminCloseBtn: document.getElementById('adminCloseBtn'),
     adminTabOverview: document.getElementById('adminTabOverview'),
     adminTabOrders: document.getElementById('adminTabOrders'),
     adminTabInventory: document.getElementById('adminTabInventory'),
@@ -1743,10 +1741,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     DOM.profileCloseBtn.addEventListener('click', closeProfileModal);
     DOM.profileUpdateForm.addEventListener('submit', handleProfileUpdate);
 
-    DOM.adminTabOverview.addEventListener('click', () => switchAdminTab('overview'));
-    DOM.adminTabOrders.addEventListener('click', () => switchAdminTab('orders'));
-    DOM.adminTabInventory.addEventListener('click', () => switchAdminTab('inventory'));
-
     // Admin Order Status Updates (delegated)
     DOM.adminOrdersTableBody.addEventListener('change', (e) => {
       if (e.target.dataset.action === 'update-order-status') {
@@ -1894,7 +1888,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     });
 
     // Modal Background Clicks to Dismiss
-    [DOM.quickViewModal, DOM.checkoutModal, DOM.droneTrackerModal, DOM.profileModal, DOM.adminModal, DOM.addProductModal].forEach(modal => {
+    [DOM.quickViewModal, DOM.checkoutModal, DOM.droneTrackerModal, DOM.profileModal, DOM.addProductModal].forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.classList.remove('active');
       });

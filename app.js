@@ -662,6 +662,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     localStorage.setItem('neon_crates_orders', JSON.stringify(STATE.orders));
     localStorage.setItem('neon_crates_users', JSON.stringify(STATE.users));
     localStorage.setItem('neon_crates_current_user', JSON.stringify(STATE.currentUser));
+    localStorage.setItem('currentUser', JSON.stringify(STATE.currentUser));
     localStorage.setItem('neon_crates_custom_products', JSON.stringify(STATE.customProducts));
     localStorage.setItem('neon_crates_hidden_products', JSON.stringify(STATE.hiddenProductIds));
     localStorage.setItem('neon_crates_theme', STATE.theme);
@@ -730,10 +731,28 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     }
   }
 
+  function handleGoogleUserRedirect() {
+    const userParam = new URLSearchParams(window.location.search).get('user');
+    if (!userParam) return;
+
+    try {
+      const user = JSON.parse(userParam);
+      if (!user || !user.id || !user.name || !user.email) return;
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('neon_crates_current_user', JSON.stringify(user));
+      STATE.currentUser = user;
+      updateUserHeaderUI();
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (error) {
+      console.warn('Could not restore Google sign-in:', error.message);
+    }
+  }
+
   function handleSignOut() {
     STATE.currentUser = null;
     STATE.authToken = null;
     saveState();
+    localStorage.removeItem('currentUser');
     updateUserHeaderUI();
     DOM.userDropdown.classList.remove('active');
     showToast('You have signed out successfully.', 'info');
@@ -1963,6 +1982,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
      Application Initialization
      ========================================================================== */
   async function init() {
+    handleGoogleUserRedirect();
     applyTheme(STATE.theme);
     updateUserHeaderUI();
     await loadServerProducts();
@@ -1971,6 +1991,8 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     renderCrateBuilder();
     setupEventListeners();
   }
+
+  window.addEventListener('load', handleGoogleUserRedirect);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

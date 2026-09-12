@@ -99,7 +99,9 @@ app.get(
     failureRedirect: `${FRONTEND_URL}login.html?error=google_auth_failed`
   })(req, res, next),
   (req, res) => {
-    res.redirect(FRONTEND_URL);
+    const user = req.user;
+    const userDetails = { id: user.id, name: user.name, email: user.email };
+    res.redirect(`${FRONTEND_URL}?user=${encodeURIComponent(JSON.stringify(userDetails))}`);
   }
 );
 function publicUser(user) {

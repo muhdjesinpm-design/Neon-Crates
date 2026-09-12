@@ -323,6 +323,19 @@
   <script>
     const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
 
+    window.addEventListener('load', () => {
+      const userParam = new URLSearchParams(window.location.search).get('user');
+      if (!userParam) return;
+      try {
+        const user = JSON.parse(userParam);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.href = 'index.html';
+      } catch (error) {
+        console.warn('Could not restore Google sign-in:', error.message);
+      }
+    });
+
     const passwordInput = document.getElementById("password");
     const togglePassword = document.getElementById("toggle-password");
     const loginForm = document.querySelector("form");

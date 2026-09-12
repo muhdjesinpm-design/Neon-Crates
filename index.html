@@ -922,6 +922,20 @@
     </div>
   </div>
 
+  <script>
+    window.addEventListener('load', () => {
+      const userParam = new URLSearchParams(window.location.search).get('user');
+      if (!userParam) return;
+      try {
+        const user = JSON.parse(userParam);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (error) {
+        console.warn('Could not restore Google sign-in:', error.message);
+      }
+    });
+  </script>
+
   <!-- Application Script -->
   <script src="app.js"></script>
 </body>

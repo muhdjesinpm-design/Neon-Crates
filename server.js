@@ -23,6 +23,7 @@ const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
 const GOOGLE_CALLBACK_URL = 'https://neoncrates-backend.onrender.com/api/auth/google/callback';
 const FRONTEND_URL = 'https://muhdjesinpm-design.github.io/Neon-Crates/';
+const ADMIN_EMAILS = ['muhdjesinpm@gmail.com'];
 
 // Latest security events log (in-memory circular log for audit)
 const securityLog = [];
@@ -78,6 +79,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         user.googleId = profile.id;
       }
 
+      user.role = ADMIN_EMAILS.includes(user.email) ? 'admin' : 'user';
+
       if (!saveDB(db)) return done(new Error('Could not save the Google account.'));
       return done(null, user);
     } catch (error) {
@@ -100,7 +103,7 @@ app.get(
   })(req, res, next),
   (req, res) => {
     const user = req.user;
-    const userDetails = { id: user.id, name: user.name, email: user.email };
+    const userDetails = { id: user.id, name: user.name, email: user.email, role: user.role };
     res.redirect(`${FRONTEND_URL}?user=${encodeURIComponent(JSON.stringify(userDetails))}`);
   }
 );

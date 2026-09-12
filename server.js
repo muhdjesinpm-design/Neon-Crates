@@ -13,7 +13,9 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 
-const DB_FILE = path.join(__dirname, 'data', 'database.json');
+const DB_DIR = path.join(__dirname, 'data');
+const DB_FILE = path.join(DB_DIR, 'database.json');
+const DEFAULT_DB = { admin: {}, users: [], products: [], orders: [] };
 const STATIC_DIR = __dirname;
 const SECRET_KEY = process.env.SECRET_KEY || 'neoncrates_cyber_secret_key_2026_x89';
 
@@ -119,21 +121,27 @@ function logSecurity(event) {
    ========================================================================== */
 function loadDB() {
   try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+
     if (!fs.existsSync(DB_FILE)) {
-      const initial = { admin: {}, users: [], products: [], orders: [] };
-      fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), 'utf8');
-      return initial;
+      fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
+      return { ...DEFAULT_DB, users: [], products: [], orders: [] };
     }
     const raw = fs.readFileSync(DB_FILE, 'utf8');
     return JSON.parse(raw);
   } catch (err) {
     console.error('Error reading database file:', err);
-    return { admin: {}, users: [], products: [], orders: [] };
+    return { ...DEFAULT_DB, users: [], products: [], orders: [] };
   }
 }
 
 function saveDB(data) {
   try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
     return true;
   } catch (err) {

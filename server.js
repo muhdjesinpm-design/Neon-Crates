@@ -209,14 +209,24 @@ function loadDB() {
     }
 
     if (!fs.existsSync(DB_FILE)) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
-      return { ...DEFAULT_DB, users: [], products: [], orders: [] };
+      const initialDB = JSON.parse(JSON.stringify(DEFAULT_DB));
+      fs.writeFileSync(DB_FILE, JSON.stringify(initialDB, null, 2), 'utf8');
+      return initialDB;
     }
+
     const raw = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(raw);
+    const storedDB = JSON.parse(raw);
+    return {
+      ...DEFAULT_DB,
+      ...storedDB,
+      users: Array.isArray(storedDB.users) ? storedDB.users : [],
+      products: Array.isArray(storedDB.products) ? storedDB.products : [],
+      orders: Array.isArray(storedDB.orders) ? storedDB.orders : [],
+      promos: Array.isArray(storedDB.promos) ? storedDB.promos : []
+    };
   } catch (err) {
     console.error('Error reading database file:', err);
-    return { ...DEFAULT_DB, users: [], products: [], orders: [] };
+    return JSON.parse(JSON.stringify(DEFAULT_DB));
   }
 }
 
@@ -225,7 +235,25 @@ function saveDB(data) {
     if (!fs.existsSync(DB_DIR)) {
       fs.mkdirSync(DB_DIR, { recursive: true });
     }
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    let storedDB = {};
+    if (fs.existsSync(DB_FILE)) {
+      try {
+        storedDB = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      } catch (err) {
+        console.error('Error parsing existing database before save:', err);
+      }
+    }
+
+    const mergedDB = {
+      ...storedDB,
+      ...data,
+      users: Array.isArray(data.users) ? data.users : (storedDB.users || []),
+      products: Array.isArray(data.products) ? data.products : (storedDB.products || []),
+      orders: Array.isArray(data.orders) ? data.orders : (storedDB.orders || []),
+      promos: Array.isArray(data.promos) ? data.promos : (storedDB.promos || [])
+    };
+
+    fs.writeFileSync(DB_FILE, JSON.stringify(mergedDB, null, 2), 'utf8');
     return true;
   } catch (err) {
     console.error('Error saving database file:', err);

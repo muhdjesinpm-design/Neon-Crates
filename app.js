@@ -1,3 +1,15 @@
+const urlParams = new URLSearchParams(window.location.search);
+const userParam = urlParams.get('user');
+if (userParam) {
+  try {
+    const user = JSON.parse(decodeURIComponent(userParam));
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } catch (e) {
+    console.error('Failed to parse OAuth user', e);
+  }
+}
+
 const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
 
 /**
@@ -481,7 +493,7 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     wishlist: JSON.parse(localStorage.getItem('neon_crates_wishlist') || '[]'),
     orders: JSON.parse(localStorage.getItem('neon_crates_orders') || JSON.stringify(SEED_ORDERS)),
     users: JSON.parse(localStorage.getItem('neon_crates_users') || JSON.stringify(SEED_USERS)),
-    currentUser: JSON.parse(localStorage.getItem('neon_crates_current_user') || 'null'),
+    currentUser: JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('neon_crates_current_user') || 'null'),
     authToken: localStorage.getItem('neon_crates_auth_token') || null,
     serverProducts: [],
     customProducts: JSON.parse(localStorage.getItem('neon_crates_custom_products') || '[]'),
@@ -728,23 +740,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     } else {
       DOM.userNameLabel.textContent = 'Sign In';
       DOM.userAvatar.textContent = '👤';
-    }
-  }
-
-  function handleGoogleUserRedirect() {
-    const userParam = new URLSearchParams(window.location.search).get('user');
-    if (!userParam) return;
-
-    try {
-      const user = JSON.parse(userParam);
-      if (!user || !user.id || !user.name || !user.email) return;
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      localStorage.setItem('neon_crates_current_user', JSON.stringify(user));
-      STATE.currentUser = user;
-      updateUserHeaderUI();
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } catch (error) {
-      console.warn('Could not restore Google sign-in:', error.message);
     }
   }
 
@@ -1982,7 +1977,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
      Application Initialization
      ========================================================================== */
   async function init() {
-    handleGoogleUserRedirect();
     applyTheme(STATE.theme);
     updateUserHeaderUI();
     await loadServerProducts();
@@ -1991,8 +1985,6 @@ const API_BASE_URL = 'https://neoncrates-backend.onrender.com';
     renderCrateBuilder();
     setupEventListeners();
   }
-
-  window.addEventListener('load', handleGoogleUserRedirect);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

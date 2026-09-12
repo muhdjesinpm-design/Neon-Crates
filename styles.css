@@ -820,12 +820,20 @@ footer {
 .tray-slots {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   margin-bottom: 1.5rem;
   flex: 1;
 }
 
 .tray-slot {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
   border: 2px dashed rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
   min-height: 95px;
@@ -855,23 +863,29 @@ footer {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .slot-item-view img {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
+  max-width: 100%;
   object-fit: cover;
   border-radius: 6px;
   margin-bottom: 0.25rem;
 }
 
 .slot-item-view .slot-name {
-  font-size: 0.78rem;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.75rem;
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
   overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 90%;
   text-align: center;
 }
 

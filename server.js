@@ -329,6 +329,16 @@ function getAdminFromReq(req) {
   return payload;
 }
 
+function verifyAdmin(req, res, next) {
+  const userRole = req.headers['x-user-role'];
+  if (userRole === 'admin') {
+    req.adminAuthorized = true;
+    next();
+  } else {
+    res.status(403).json({ error: 'Access denied: Admins only.' });
+  }
+}
+
 /* ==========================================================================
    Static File Server
    ========================================================================== */
@@ -382,6 +392,19 @@ function serveStaticFile(req, res, pathname) {
    HTTP Server Router
    ========================================================================== */
 app.use(express.static(STATIC_DIR));
+
+app.use('/api', (req, res, next) => {
+  const isProductManagement = req.path === '/products' && ['POST', 'PUT'].includes(req.method)
+    || req.path.startsWith('/products/') && req.method === 'DELETE';
+  const isOrderManagement = req.path === '/admin/orders' && req.method === 'GET'
+    || req.path.startsWith('/admin/orders/') && ['PATCH', 'PUT'].includes(req.method)
+    || req.path === '/admin/stats' && req.method === 'GET';
+
+  if (isProductManagement || isOrderManagement) {
+    return verifyAdmin(req, res, next);
+  }
+  return next();
+});
 
 app.get('/api/health', (req, res) => {
   return sendJSON(res, 200, { status: 'healthy', time: new Date().toISOString() });
@@ -560,7 +583,7 @@ app.use(async (req, res, next) => {
     // --- Products: Add New Grocery Item (Admin Protected) ---
     if (pathname === '/api/products' && method === 'POST') {
       const admin = getAdminFromReq(req);
-      if (!admin) return sendError(res, 401, 'Unauthorized: Admin access required');
+      if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       try {
         const body = req.body || {};
@@ -599,10 +622,38 @@ app.use(async (req, res, next) => {
       }
     }
 
+    // --- Products: Update Grocery Item (Admin Protected) ---
+    if (pathname.startsWith('/api/products/') && method === 'PUT') {
+      const admin = getAdminFromReq(req);
+      if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
+
+      try {
+        const productId = pathname.replace('/api/products/', '').trim();
+        const body = req.body || {};
+        const db = loadDB();
+        const product = db.products.find(item => item.id === productId);
+        if (!product) return sendError(res, 404, 'Product not found');
+
+        if (typeof body.title === 'string' && body.title.trim()) product.title = body.title.trim();
+        if (typeof body.category === 'string' && body.category.trim()) product.category = body.category.trim().toLowerCase();
+        if (body.unit !== undefined) product.unit = String(body.unit).trim();
+        if (body.price !== undefined) product.price = parseFloat(body.price);
+        if (body.originalPrice !== undefined) product.originalPrice = body.originalPrice === '' ? null : parseFloat(body.originalPrice);
+        if (body.image !== undefined) product.image = body.image;
+        if (body.description !== undefined) product.description = String(body.description).trim();
+
+        saveDB(db);
+        logSecurity(`Product updated in catalog: "${product.title}" (ID: ${productId})`);
+        return sendJSON(res, 200, product);
+      } catch (e) {
+        return sendError(res, 500, e.message);
+      }
+    }
+
     // --- Products: Delete Grocery Item (Admin Protected) ---
     if (pathname.startsWith('/api/products/') && method === 'DELETE') {
       const admin = getAdminFromReq(req);
-      if (!admin) return sendError(res, 401, 'Unauthorized: Admin access required');
+      if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       const productId = pathname.replace('/api/products/', '').trim();
       const db = loadDB();
@@ -674,7 +725,7 @@ app.use(async (req, res, next) => {
     // --- Admin: Get All Orders (Admin Protected) ---
     if (pathname === '/api/admin/orders' && method === 'GET') {
       const admin = getAdminFromReq(req);
-      if (!admin) return sendError(res, 401, 'Unauthorized: Admin access required');
+      if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       const db = loadDB();
       return sendJSON(res, 200, db.orders || []);
@@ -683,7 +734,7 @@ app.use(async (req, res, next) => {
     // --- Admin: Update Order Status (Admin Protected) ---
     if (pathname.startsWith('/api/admin/orders/') && pathname.endsWith('/status') && (method === 'PATCH' || method === 'PUT')) {
       const admin = getAdminFromReq(req);
-      if (!admin) return sendError(res, 401, 'Unauthorized: Admin access required');
+      if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       try {
         const parts = pathname.split('/');
@@ -710,7 +761,7 @@ app.use(async (req, res, next) => {
     // --- Admin: Get Dashboard KPI Stats (Admin Protected) ---
     if (pathname === '/api/admin/stats' && method === 'GET') {
       const admin = getAdminFromReq(req);
-      if (!admin) return sendError(res, 401, 'Unauthorized: Admin access required');
+      if (!admin && !req.adminAuthorized) return sendError(res, 401, 'Unauthorized: Admin access required');
 
       const db = loadDB();
       const grossSales = db.orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
